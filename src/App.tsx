@@ -29,17 +29,17 @@ export default function App() {
                 <Landmark className="text-primary w-8 h-8" />
               </div>
               <div>
-                <h2 className="text-white text-xl font-bold leading-tight tracking-tight">睿典股票工作室</h2>
-                <p className="text-primary text-[10px] uppercase tracking-[0.2em] font-semibold">精品资产管理</p>
+                <h2 className="text-white text-xl font-bold leading-tight tracking-tight">睿典投资研究室</h2>
+                <p className="text-primary text-[10px] uppercase tracking-[0.2em] font-semibold">个人投资研究展示</p>
               </div>
             </div>
             <nav className="hidden md:flex items-center gap-10">
               <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#">首页</a>
-              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#about">关于我们</a>
-              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#strategies">投资策略</a>
-              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#contact">联系我们</a>
+              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#about">关于主理人</a>
+              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#strategies">策略研究</a>
+              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#contact">交流探讨</a>
               <button className="bg-primary hover:bg-primary/90 text-background-dark px-6 py-2.5 rounded-lg text-sm font-bold transition-all transform hover:scale-105 active:scale-95">
-                立即投资
+                联系交流
               </button>
             </nav>
           </div>
@@ -66,21 +66,21 @@ export default function App() {
               className="max-w-2xl"
             >
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider mb-6">
-                <Verified className="w-4 h-4" /> 专业管理
+                <Verified className="w-4 h-4" /> 深度研究展示
               </div>
               <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.1] mb-6 tracking-tight">
-                张岩：<br/><span className="text-primary">专业股票投资工作室</span>
+                张岩：<br/><span className="text-primary">个人投资研究展示</span>
               </h1>
               <p className="text-lg md:text-xl text-slate-300 leading-relaxed mb-10 font-light">
-                硕士，CFA | 美股与A股市场专家 <br className="hidden md:block"/>
-                睿典股票工作室负责人。在全求股票市场提供数据驱动的卓越投资表现。
+                硕士，CFA | 美股与A股市场研究者 <br className="hidden md:block"/>
+                睿典投资研究室主理人。专注于全求股票市场的数据驱动研究与策略探索。
               </p>
               <div className="flex flex-wrap gap-4">
                 <button className="bg-primary hover:bg-primary/90 text-background-dark px-8 py-4 rounded-xl text-base font-bold transition-all shadow-lg shadow-primary/20">
-                  探索策略
+                  探索策略研究
                 </button>
                 <button className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-xl text-base font-bold backdrop-blur-sm transition-all">
-                  查看业绩
+                  查看研究记录
                 </button>
               </div>
             </motion.div>
@@ -109,10 +109,10 @@ export default function App() {
               </motion.div>
               <div className="space-y-8">
                 <div>
-                  <h2 className="text-primary font-bold uppercase tracking-widest text-sm mb-3">关于负责人</h2>
+                  <h2 className="text-primary font-bold uppercase tracking-widest text-sm mb-3">关于主理人</h2>
                   <h3 className="text-4xl font-bold text-white mb-6">张岩，硕士 & CFA</h3>
                   <p className="text-slate-400 text-lg leading-relaxed">
-                    张岩常驻深圳金融枢纽，以严谨的数据驱动方法深耕美股和A股市场。凭借硕士学位和全球公认的特许金融分析师（CFA）资格，他将定量精准度与定性洞察力完美结合。
+                    张岩常驻深圳金融枢纽，以严谨的数据驱动方法深耕美股和A股市场研究。凭借硕士学位和全球公认的特许金融分析师（CFA）资格，他致力于将定量精准度与定性洞察力应用于个人投资实践。
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-6">
@@ -139,15 +139,15 @@ export default function App() {
         <section className="py-24 bg-[#1a1710]" id="strategies">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-20">
-              <h2 className="text-primary font-bold uppercase tracking-widest text-sm mb-3">投资框架</h2>
-              <h3 className="text-4xl font-bold text-white">先进投资策略</h3>
+              <h2 className="text-primary font-bold uppercase tracking-widest text-sm mb-3">研究框架</h2>
+              <h3 className="text-4xl font-bold text-white">个人策略研究展示</h3>
             </div>
             
             {/* Live Strategies */}
             <div className="mb-16">
               <div className="flex items-center gap-3 mb-8 border-l-4 border-primary pl-4">
                 <TrendingUp className="text-primary w-6 h-6" />
-                <h4 className="text-2xl font-bold text-white uppercase tracking-tight">实盘（Live）投资组合</h4>
+                <h4 className="text-2xl font-bold text-white uppercase tracking-tight">个人实盘研究组合</h4>
               </div>
               <div className="grid md:grid-cols-3 gap-8">
                 {/* Strategy 1 */}
@@ -236,20 +236,20 @@ export default function App() {
               className="glass-panel p-12 md:p-20 rounded-3xl border-primary/20 shadow-2xl"
             >
               <Users2 className="text-primary w-16 h-16 mx-auto mb-8" />
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-6">共创未来增长</h2>
+              <h2 className="text-4xl md:text-5xl font-black text-white mb-6">投资研究交流</h2>
               <p className="text-slate-300 text-lg leading-relaxed mb-10 max-w-2xl mx-auto">
-                睿典股票工作室目前正在筹备推出专业的私募基金产品。我们诚邀志同道合、拥有长期愿景的专业投资者与我们建立联系。
+                睿典投资研究室致力于探索长期稳健的投资逻辑。欢迎志同道合、对量化研究与基本面分析感兴趣的朋友进行学术探讨与经验交流。
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-background-dark px-10 py-4 rounded-xl text-lg font-bold shadow-xl shadow-primary/20 transition-all">
-                  咨询私募基金详情
+                  发送交流邮件
                 </button>
                 <button className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/20 px-10 py-4 rounded-xl text-lg font-bold backdrop-blur-sm transition-all">
-                  联系办公室
+                  查看研究博客
                 </button>
               </div>
               <p className="mt-12 text-slate-500 text-xs uppercase tracking-[0.2em] font-medium">
-                仅限合格机构投资者及专业投资者
+                本站仅作为个人投资记录与研究展示，不构成任何投资建议
               </p>
             </motion.div>
           </div>
@@ -262,10 +262,10 @@ export default function App() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="flex items-center gap-3">
               <Landmark className="text-primary w-6 h-6" />
-              <span className="text-white font-bold text-lg">睿典股票工作室</span>
+              <span className="text-white font-bold text-lg">睿典投资研究室</span>
             </div>
             <div className="text-slate-500 text-sm">
-              © 2024 张岩, CFA. 保留所有权利。专业投资组合管理。
+              © 2024 张岩, CFA. 保留所有权利。个人投资研究展示。
             </div>
             <div className="flex gap-6">
               <a className="text-slate-400 hover:text-primary transition-colors" href="#"><Share2 className="w-5 h-5" /></a>
