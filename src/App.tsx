@@ -13,7 +13,10 @@ import {
   Mail, 
   FileText,
   FlaskConical,
-  TrendingUp
+  TrendingUp,
+  Brain,
+  RefreshCw,
+  ArrowUpDown
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -65,8 +68,8 @@ export default function App() {
               transition={{ duration: 0.8 }}
               className="max-w-2xl"
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider mb-6">
-                <Verified className="w-4 h-4" /> 深度研究展示
+              <div className="text-primary/90 text-sm font-medium mb-6 tracking-wide border-l-2 border-primary/30 pl-3">
+                个人投资策略展示 / 教育交流，不提供个性化建议，用户独立决策自担风险
               </div>
               <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.1] mb-6 tracking-tight">
                 张岩：<br/><span className="text-primary">个人投资研究展示</span>
@@ -76,9 +79,12 @@ export default function App() {
                 睿典投资研究室主理人。专注于全求股票市场的数据驱动研究与策略探索。
               </p>
               <div className="flex flex-wrap gap-4">
-                <button className="bg-primary hover:bg-primary/90 text-background-dark px-8 py-4 rounded-xl text-base font-bold transition-all shadow-lg shadow-primary/20">
+                <a 
+                  href="#strategies"
+                  className="bg-primary hover:bg-primary/90 text-background-dark px-8 py-4 rounded-xl text-base font-bold transition-all shadow-lg shadow-primary/20 inline-block"
+                >
                   探索策略研究
-                </button>
+                </a>
                 <button className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-xl text-base font-bold backdrop-blur-sm transition-all">
                   查看研究记录
                 </button>
@@ -102,7 +108,7 @@ export default function App() {
                   <img 
                     alt="张岩, CFA" 
                     className="w-full h-full object-cover" 
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMTrPTbX711lOR4sTYS1MQkJX2PFTdX-txQiswAbJ6KgmEoed6vfwFKvyyl9e2I62JfZ_K4F4m5tbUV-wWO-EFvfNmoj6clrFTBShF9bUXJw6_2j_axOh8ebziHYb8QvJ3OgzJqu-k_md1ov8VFkFEyjdG0zt34S9QbQyJHQRNgiGkPWav_rIMaVDLi55exIpGkPXsUp-RnpcefmgHJFWoatwL7nSspng8hr2KQGabf91g5QuLC7uwZj4tD021PVdlu2aIqXVZcnFo"
+                    src="https://storage.googleapis.com/static-content-ais/ais-pre-lt6hbn46plprmskx2d2bgp-613917986540.asia-southeast1.run.app/user_upload_image_1741613061.png"
                     referrerPolicy="no-referrer"
                   />
                 </div>
@@ -147,7 +153,7 @@ export default function App() {
             <div className="mb-16">
               <div className="flex items-center gap-3 mb-8 border-l-4 border-primary pl-4">
                 <TrendingUp className="text-primary w-6 h-6" />
-                <h4 className="text-2xl font-bold text-white uppercase tracking-tight">个人实盘研究组合</h4>
+                <h4 className="text-2xl font-bold text-white uppercase tracking-tight">实盘策略模型</h4>
               </div>
               <div className="grid md:grid-cols-3 gap-8">
                 {/* Strategy 1 */}
@@ -156,13 +162,13 @@ export default function App() {
                   className="glass-panel p-8 rounded-2xl hover:border-primary/40 transition-all group"
                 >
                   <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
-                    <BarChart3 className="w-6 h-6" />
+                    <ArrowUpDown className="w-6 h-6" />
                   </div>
-                  <h5 className="text-xl font-bold text-white mb-3 tracking-tight">量化低波动策略</h5>
-                  <p className="text-slate-400 text-sm leading-relaxed mb-6">通过统计套利模型，利用算法管理选股，专注于稳定性和下行保护。</p>
+                  <h5 className="text-xl font-bold text-white mb-3 tracking-tight">量化低波动套利策略</h5>
+                  <p className="text-slate-400 text-sm leading-relaxed mb-6">通过统计套利模型，利用算法选股/买卖股票，在流动性较低的市场长期有效。专注于稳定性低波和下行保护。</p>
                   <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest pt-6 border-t border-white/5">
                     <span className="text-slate-500">风险等级</span>
-                    <span className="text-emerald-500">中低风险</span>
+                    <span className="text-primary">中高风险</span>
                   </div>
                 </motion.div>
                 {/* Strategy 2 */}
@@ -171,10 +177,10 @@ export default function App() {
                   className="glass-panel p-8 rounded-2xl hover:border-primary/40 transition-all group"
                 >
                   <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
-                    <LineChart className="w-6 h-6" />
+                    <Brain className="w-6 h-6" />
                   </div>
                   <h5 className="text-xl font-bold text-white mb-3 tracking-tight">主观多头 + 量化增强</h5>
-                  <p className="text-slate-400 text-sm leading-relaxed mb-6">将深度基本面研究与量化优化相结合，在核心股票持仓中创造超额收益。</p>
+                  <p className="text-slate-400 text-sm leading-relaxed mb-6">通过多元化的主观交易手法（基本面趋势持有/题材热点龙头补涨挖掘/情绪博弈），并行ai算法对持有的股票做t增强持仓收益，创造超额收益。</p>
                   <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest pt-6 border-t border-white/5">
                     <span className="text-slate-500">风险等级</span>
                     <span className="text-primary">中高风险</span>
@@ -186,13 +192,13 @@ export default function App() {
                   className="glass-panel p-8 rounded-2xl hover:border-primary/40 transition-all group"
                 >
                   <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
-                    <Layers className="w-6 h-6" />
+                    <RefreshCw className="w-6 h-6" />
                   </div>
                   <h5 className="text-xl font-bold text-white mb-3 tracking-tight">ETF 轮动策略</h5>
-                  <p className="text-slate-400 text-sm leading-relaxed mb-6">利用动量轮动模型，在全球不同行业和资产类别之间进行战术性资产配置。</p>
+                  <p className="text-slate-400 text-sm leading-relaxed mb-6">利用多维打分算法模型，选择赛道ETF配置，获取超额收益</p>
                   <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest pt-6 border-t border-white/5">
                     <span className="text-slate-500">风险等级</span>
-                    <span className="text-primary">中等风险</span>
+                    <span className="text-emerald-500">中低风险</span>
                   </div>
                 </motion.div>
               </div>
