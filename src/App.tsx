@@ -37,6 +37,7 @@ import {
   Legend
 } from 'recharts';
 import BlogPage from './BlogPage';
+import zhangyanImg from './assets/zhangyan.jpg';
 
 const StrategyCard = ({ 
   title, 
@@ -633,7 +634,7 @@ function LandingPage() {
                   <img 
                     alt="张岩, CFA" 
                     className="w-full h-full object-cover" 
-                    src="/zhangyan.jpg"
+                    src={zhangyanImg}
                     referrerPolicy="no-referrer"
                   />
                 </div>
@@ -855,7 +856,7 @@ function LandingPage() {
                   name: "睿典主理人",
                   role: "创始人 / 首席策略师",
                   bio: "硕士学位，CFA持证人。深耕美股与A股市场多年，擅长将宏观基本面研究与量化模型相结合，构建稳健的投资组合。",
-                  image: "/zhangyan.jpg"
+                  image: zhangyanImg
                 },
                 {
                   name: "林博士",
