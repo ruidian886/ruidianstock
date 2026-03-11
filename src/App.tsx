@@ -882,7 +882,7 @@ function LandingPage() {
                     <img 
                       src={member.image} 
                       alt={member.name} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 grayscale hover:grayscale-0"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       referrerPolicy="no-referrer"
                     />
                   </div>
