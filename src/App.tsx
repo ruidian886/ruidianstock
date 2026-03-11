@@ -1,10 +1,13 @@
+import { useState } from 'react';
+import { Routes, Route, Link } from 'react-router-dom';
 import { 
   Landmark, 
   Verified, 
   School, 
   Award, 
+  Zap,
   Download, 
-  LineChart, 
+  LineChart as LineChartIcon, 
   BarChart3, 
   Layers, 
   Globe, 
@@ -16,13 +19,226 @@ import {
   TrendingUp,
   Brain,
   RefreshCw,
-  ArrowUpDown
+  ArrowUpDown,
+  ChevronDown,
+  ChevronUp,
+  X
 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer 
+} from 'recharts';
+import BlogPage from './BlogPage';
+
+const StrategyCard = ({ 
+  title, 
+  description, 
+  icon: Icon, 
+  riskLevel, 
+  riskColor,
+  details,
+  chartData
+}: { 
+  title: string, 
+  description: string, 
+  icon: any, 
+  riskLevel: string, 
+  riskColor: string,
+  details: string,
+  chartData: { name: string, value: number }[]
+}) => {
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="glass-panel overflow-hidden rounded-3xl border border-white/5 hover:border-primary/30 transition-all group mb-12"
+    >
+      <div className="grid lg:grid-cols-12 gap-0">
+        {/* Info Side */}
+        <div className="lg:col-span-5 p-8 md:p-12 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/5 bg-white/[0.02]">
+          <div>
+            <div className="flex justify-between items-start mb-8">
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500">
+                <Icon className="w-7 h-7" />
+              </div>
+              <button 
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/30 text-[10px] font-black text-sky-400 hover:bg-sky-500/20 transition-all uppercase tracking-[0.15em] shadow-lg shadow-sky-500/5 active:scale-95 cursor-default"
+              >
+                策略详情
+                <ChevronDown className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <h5 className="text-3xl font-bold text-white mb-6 tracking-tight leading-tight">{title}</h5>
+            <p className="text-slate-400 text-lg leading-relaxed mb-8 font-light">{description}</p>
+            
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em]">
+                <span className="text-slate-500">风险等级:</span>
+                <span className={`${riskColor} px-3 py-1 rounded-full bg-current/10 border border-current/20`}>{riskLevel}</span>
+              </div>
+              
+              <div className="pt-8 border-t border-white/5">
+                <h6 className="text-white font-bold text-sm mb-4 flex items-center gap-2 uppercase tracking-widest opacity-60">
+                  <FileText className="w-4 h-4 text-primary" />
+                  策略核心逻辑
+                </h6>
+                <div className="space-y-3">
+                  {details.split('\n').map((line, i) => (
+                    <p key={i} className="text-slate-400 text-sm leading-relaxed flex gap-3">
+                      <span className="text-primary font-bold">{i + 1}.</span>
+                      {line.replace(/^\d+\.\s*/, '')}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Chart Side */}
+        <div className="lg:col-span-7 p-8 md:p-12 bg-black/20 flex flex-col">
+          <div className="flex justify-between items-center mb-8">
+            <h6 className="text-white font-bold text-sm flex items-center gap-2 uppercase tracking-widest opacity-60">
+              <LineChartIcon className="w-4 h-4 text-primary" />
+              净值表现趋势 (周更新)
+            </h6>
+            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              实时模拟数据
+            </div>
+          </div>
+          
+          <div className="flex-grow min-h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <defs>
+                  <linearGradient id={`gradient-${title}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#F27D26" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#F27D26" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.2} />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#64748b', fontSize: 10 }}
+                  dy={10}
+                />
+                <YAxis 
+                  hide 
+                  domain={['dataMin - 5', 'dataMax + 5']} 
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#0f172a', 
+                    border: '1px solid rgba(255,255,255,0.1)', 
+                    borderRadius: '12px', 
+                    color: '#fff',
+                    fontSize: '12px',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+                  }}
+                  itemStyle={{ color: '#F27D26' }}
+                  cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 2 }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="#F27D26" 
+                  strokeWidth={4} 
+                  dot={false}
+                  activeDot={{ r: 6, fill: '#F27D26', stroke: '#fff', strokeWidth: 2 }}
+                  animationDuration={2000}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="mt-8 grid grid-cols-3 gap-4">
+            <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+              <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">年化收益率</p>
+              <p className="text-xl font-bold text-white">24.5%</p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+              <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">最大回撤</p>
+              <p className="text-xl font-bold text-white">-8.2%</p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+              <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">夏普比率</p>
+              <p className="text-xl font-bold text-white">1.82</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/blog" element={<BlogPage />} />
+    </Routes>
+  );
+}
+
+function LandingPage() {
+  const [showQR, setShowQR] = useState(false);
+
+  return (
+    <div id="home" className="min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
+      {/* QR Code Modal */}
+      <AnimatePresence>
+        {showQR && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowQR(false)}
+              className="absolute inset-0 bg-background-dark/90 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-2xl max-w-sm w-full text-center border border-primary/20"
+            >
+              <button 
+                onClick={() => setShowQR(false)}
+                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-primary transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <div className="mb-6">
+                <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Landmark className="text-primary w-10 h-10" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">联系交流</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">扫描下方二维码添加微信进行探讨</p>
+              </div>
+              <div className="aspect-square bg-white p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-inner mb-6">
+                <img 
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ais-pre-lt6hbn46plprmskx2d2bgp-613917986540.asia-southeast1.run.app" 
+                  alt="联系二维码" 
+                  className="w-full h-full object-contain"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+              <p className="text-slate-400 text-xs uppercase tracking-widest font-medium">睿典投资研究工作室</p>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-50 w-full border-b border-primary/10 bg-background-dark/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -32,16 +248,20 @@ export default function App() {
                 <Landmark className="text-primary w-8 h-8" />
               </div>
               <div>
-                <h2 className="text-white text-xl font-bold leading-tight tracking-tight">睿典投资研究室</h2>
+                <h2 className="text-white text-xl font-bold leading-tight tracking-tight">睿典：个人投资研究工作室</h2>
                 <p className="text-primary text-[10px] uppercase tracking-[0.2em] font-semibold">个人投资研究展示</p>
               </div>
             </div>
             <nav className="hidden md:flex items-center gap-10">
-              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#">首页</a>
+              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#home">首页</a>
               <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#about">关于主理人</a>
               <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#strategies">策略研究</a>
+              <Link className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" to="/blog" target="_blank">研究博客</Link>
               <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#contact">交流探讨</a>
-              <button className="bg-primary hover:bg-primary/90 text-background-dark px-6 py-2.5 rounded-lg text-sm font-bold transition-all transform hover:scale-105 active:scale-95">
+              <button 
+                onClick={() => setShowQR(true)}
+                className="bg-primary hover:bg-primary/90 text-background-dark px-6 py-2.5 rounded-lg text-sm font-bold transition-all transform hover:scale-105 active:scale-95 inline-flex items-center justify-center"
+              >
                 联系交流
               </button>
             </nav>
@@ -68,33 +288,37 @@ export default function App() {
               transition={{ duration: 0.8 }}
               className="max-w-2xl"
             >
-              <div className="text-primary/90 text-sm font-medium mb-6 tracking-wide border-l-2 border-primary/30 pl-3">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs md:text-sm font-bold mb-8 tracking-wide shadow-lg shadow-primary/5">
+                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                 个人投资策略展示 / 教育交流，不提供个性化建议，用户独立决策自担风险
               </div>
               <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.1] mb-6 tracking-tight">
-                张岩：<br/><span className="text-primary">个人投资研究展示</span>
+                睿典：<br/><span className="text-primary">个人投资研究工作室</span>
               </h1>
               <p className="text-lg md:text-xl text-slate-300 leading-relaxed mb-10 font-light">
-                硕士，CFA | 美股与A股市场研究者 <br className="hidden md:block"/>
-                睿典投资研究室主理人。专注于全求股票市场的数据驱动研究与策略探索。
+                专注于全球股票市场的数据驱动研究与策略探索 <br className="hidden md:block"/>
+                <span className="text-primary font-medium">主理人：硕士，CFA | 美股与A股市场研究者 | 操盘实战者</span>
               </p>
               <div className="flex flex-wrap gap-4">
                 <a 
                   href="#strategies"
-                  className="bg-primary hover:bg-primary/90 text-background-dark px-8 py-4 rounded-xl text-base font-bold transition-all shadow-lg shadow-primary/20 inline-block"
+                  className="bg-primary hover:bg-primary/90 text-background-dark px-8 py-4 rounded-xl text-base font-bold transition-all shadow-lg shadow-primary/20 inline-flex items-center justify-center whitespace-nowrap"
                 >
                   探索策略研究
                 </a>
-                <button className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-xl text-base font-bold backdrop-blur-sm transition-all">
-                  查看研究记录
-                </button>
+                <a 
+                  href="#team" 
+                  className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-xl text-base font-bold backdrop-blur-sm transition-all inline-flex items-center justify-center"
+                >
+                  关于睿典
+                </a>
               </div>
             </motion.div>
           </div>
         </section>
 
         {/* About Section */}
-        <section className="py-24 bg-background-light dark:bg-background-dark border-y border-primary/5" id="about">
+        <section className="py-24 bg-background-light dark:bg-background-dark border-y border-primary-dim/5" id="about">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <motion.div 
@@ -103,37 +327,44 @@ export default function App() {
                 viewport={{ once: true }}
                 className="relative"
               >
-                <div className="absolute -inset-4 bg-primary/20 rounded-2xl blur-2xl opacity-20"></div>
+                <div className="absolute -inset-4 bg-primary-dim/20 rounded-2xl blur-2xl opacity-20"></div>
                 <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/5 shadow-2xl">
                   <img 
                     alt="张岩, CFA" 
                     className="w-full h-full object-cover" 
-                    src="https://storage.googleapis.com/static-content-ais/ais-pre-lt6hbn46plprmskx2d2bgp-613917986540.asia-southeast1.run.app/user_upload_image_1741613061.png"
+                    src="/张岩.jpg"
                     referrerPolicy="no-referrer"
                   />
                 </div>
               </motion.div>
               <div className="space-y-8">
                 <div>
-                  <h2 className="text-primary font-bold uppercase tracking-widest text-sm mb-3">关于主理人</h2>
-                  <h3 className="text-4xl font-bold text-white mb-6">张岩，硕士 & CFA</h3>
-                  <p className="text-slate-400 text-lg leading-relaxed">
-                    张岩常驻深圳金融枢纽，以严谨的数据驱动方法深耕美股和A股市场研究。凭借硕士学位和全球公认的特许金融分析师（CFA）资格，他致力于将定量精准度与定性洞察力应用于个人投资实践。
+                  <h2 className="text-primary-dim font-bold uppercase tracking-widest text-sm mb-3">关于主理人</h2>
+                  <h3 className="text-3xl md:text-4xl font-bold text-primary-dim mb-6 leading-tight">
+                    主理人：硕士 & CFA
+                  </h3>
+                  <p className="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
+                    睿典投资研究工作室致力于将严谨的数据驱动方法与深入的基本面研究相结合。主理人常驻深圳金融枢纽，深耕美股和A股市场，凭借硕士学位和特许金融分析师（CFA）资格，致力于将定量精准度与定性洞察力应用于个人投资实践与策略探索。
                   </p>
                 </div>
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="p-6 rounded-xl bg-primary/5 border border-primary/10">
-                    <School className="text-primary w-8 h-8 mb-3" />
-                    <h4 className="text-white font-bold text-lg mb-1">硕士学位</h4>
-                    <p className="text-slate-500 text-sm">卓越的学术背景</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="p-6 rounded-xl bg-primary-dim/5 border border-primary-dim/10">
+                    <School className="text-primary-dim w-8 h-8 mb-3" />
+                    <h4 className="text-slate-700 dark:text-white font-bold text-lg mb-1">硕士学位</h4>
+                    <p className="text-slate-400 dark:text-slate-400 text-sm">卓越的学术背景</p>
                   </div>
-                  <div className="p-6 rounded-xl bg-primary/5 border border-primary/10">
-                    <Award className="text-primary w-8 h-8 mb-3" />
-                    <h4 className="text-white font-bold text-lg mb-1">CFA 持证人</h4>
-                    <p className="text-slate-500 text-sm">金融行业黄金标准</p>
+                  <div className="p-6 rounded-xl bg-primary-dim/5 border border-primary-dim/10">
+                    <Award className="text-primary-dim w-8 h-8 mb-3" />
+                    <h4 className="text-slate-700 dark:text-white font-bold text-lg mb-1">CFA 持证人</h4>
+                    <p className="text-slate-400 dark:text-slate-400 text-sm">金融行业黄金标准</p>
+                  </div>
+                  <div className="p-6 rounded-xl bg-primary-dim/5 border border-primary-dim/10">
+                    <Zap className="text-primary-dim w-8 h-8 mb-3" />
+                    <h4 className="text-slate-700 dark:text-white font-bold text-lg mb-1">实战交易</h4>
+                    <p className="text-slate-400 dark:text-slate-400 text-sm">卓越的实盘执行能力</p>
                   </div>
                 </div>
-                <button className="inline-flex items-center gap-2 text-primary font-bold hover:underline">
+                <button className="inline-flex items-center gap-2 text-primary-dim font-bold hover:underline">
                   下载专业简历 <Download className="w-4 h-4" />
                 </button>
               </div>
@@ -155,52 +386,43 @@ export default function App() {
                 <TrendingUp className="text-primary w-6 h-6" />
                 <h4 className="text-2xl font-bold text-white uppercase tracking-tight">实盘策略模型</h4>
               </div>
-              <div className="grid md:grid-cols-3 gap-8">
-                {/* Strategy 1 */}
-                <motion.div 
-                  whileHover={{ y: -5 }}
-                  className="glass-panel p-8 rounded-2xl hover:border-primary/40 transition-all group"
-                >
-                  <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
-                    <ArrowUpDown className="w-6 h-6" />
-                  </div>
-                  <h5 className="text-xl font-bold text-white mb-3 tracking-tight">量化低波动套利策略</h5>
-                  <p className="text-slate-400 text-sm leading-relaxed mb-6">通过统计套利模型，利用算法选股/买卖股票，在流动性较低的市场长期有效。专注于稳定性低波和下行保护。</p>
-                  <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest pt-6 border-t border-white/5">
-                    <span className="text-slate-500">风险等级</span>
-                    <span className="text-primary">中高风险</span>
-                  </div>
-                </motion.div>
-                {/* Strategy 2 */}
-                <motion.div 
-                  whileHover={{ y: -5 }}
-                  className="glass-panel p-8 rounded-2xl hover:border-primary/40 transition-all group"
-                >
-                  <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
-                    <Brain className="w-6 h-6" />
-                  </div>
-                  <h5 className="text-xl font-bold text-white mb-3 tracking-tight">主观多头 + 量化增强</h5>
-                  <p className="text-slate-400 text-sm leading-relaxed mb-6">通过多元化的主观交易手法（基本面趋势持有/题材热点龙头补涨挖掘/情绪博弈），并行ai算法对持有的股票做t增强持仓收益，创造超额收益。</p>
-                  <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest pt-6 border-t border-white/5">
-                    <span className="text-slate-500">风险等级</span>
-                    <span className="text-primary">中高风险</span>
-                  </div>
-                </motion.div>
-                {/* Strategy 3 */}
-                <motion.div 
-                  whileHover={{ y: -5 }}
-                  className="glass-panel p-8 rounded-2xl hover:border-primary/40 transition-all group"
-                >
-                  <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
-                    <RefreshCw className="w-6 h-6" />
-                  </div>
-                  <h5 className="text-xl font-bold text-white mb-3 tracking-tight">ETF 轮动策略</h5>
-                  <p className="text-slate-400 text-sm leading-relaxed mb-6">利用多维打分算法模型，选择赛道ETF配置，获取超额收益</p>
-                  <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest pt-6 border-t border-white/5">
-                    <span className="text-slate-500">风险等级</span>
-                    <span className="text-emerald-500">中低风险</span>
-                  </div>
-                </motion.div>
+              <div className="flex flex-col gap-8">
+                <StrategyCard 
+                  title="量化低波动套利策略"
+                  description="通过统计套利模型，利用算法选股/买卖股票，在流动性较低的市场长期有效。专注于稳定性低波和下行保护。"
+                  icon={ArrowUpDown}
+                  riskLevel="中高风险"
+                  riskColor="text-primary"
+                  details="1. 策略逻辑：基于统计套利原理，捕捉市场微观结构中的定价偏差。\n2. 选股模型：多因子量化选股，重点关注流动性、波动率及反转因子。\n3. 风险控制：严格的下行保护机制，通过动态对冲降低组合波动。"
+                  chartData={[
+                    { name: 'W1', value: 100 }, { name: 'W2', value: 101.5 }, { name: 'W3', value: 101.2 }, { name: 'W4', value: 102.8 },
+                    { name: 'W5', value: 103.5 }, { name: 'W6', value: 103.2 }, { name: 'W7', value: 104.1 }, { name: 'W8', value: 105.2 },
+                  ]}
+                />
+                <StrategyCard 
+                  title="主观多头 + 量化增强"
+                  description="通过多元化的主观交易手法（基本面趋势持有/题材热点龙头补涨挖掘/情绪博弈），并行ai算法对持有的股票做t增强持仓收益，创造超额收益。"
+                  icon={Brain}
+                  riskLevel="中高风险"
+                  riskColor="text-primary"
+                  details="1. 主观部分：深耕基本面研究，捕捉行业趋势及题材热点。\n2. 量化部分：AI算法辅助日内交易（做T），优化买卖点，提升持仓收益。\n3. 核心优势：结合人的洞察力与机器的执行力，实现超额收益最大化。"
+                  chartData={[
+                    { name: 'W1', value: 100 }, { name: 'W2', value: 105 }, { name: 'W3', value: 103 }, { name: 'W4', value: 108 },
+                    { name: 'W5', value: 112 }, { name: 'W6', value: 110 }, { name: 'W7', value: 118 }, { name: 'W8', value: 125 },
+                  ]}
+                />
+                <StrategyCard 
+                  title="ETF 轮动策略"
+                  description="利用多维打分算法模型，选择赛道ETF配置，获取超额收益"
+                  icon={RefreshCw}
+                  riskLevel="中低风险"
+                  riskColor="text-emerald-500"
+                  details="1. 轮动模型：基于动量、估值及宏观指标的多维打分系统。\n2. 资产配置：在全球及行业ETF间进行动态切换，规避弱势资产。\n3. 收益目标：通过赛道优选，在不同市场环境下获取稳健的超额收益。"
+                  chartData={[
+                    { name: 'W1', value: 100 }, { name: 'W2', value: 102 }, { name: 'W3', value: 104 }, { name: 'W4', value: 103 },
+                    { name: 'W5', value: 106 }, { name: 'W6', value: 108 }, { name: 'W7', value: 107 }, { name: 'W8', value: 110 },
+                  ]}
+                />
               </div>
             </div>
 
@@ -210,15 +432,78 @@ export default function App() {
                 <FlaskConical className="text-slate-500 w-6 h-6" />
                 <h4 className="text-2xl font-bold text-white uppercase tracking-tight">模拟模型 (R&D)</h4>
               </div>
-              <div className="grid md:grid-cols-3 gap-8">
-                <div className="glass-panel p-8 rounded-2xl border-dashed border-slate-700 hover:border-slate-500 transition-all opacity-80">
-                  <div className="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 mb-6">
-                    <Globe className="w-6 h-6" />
-                  </div>
-                  <h5 className="text-xl font-bold text-white mb-3 tracking-tight">全球全天候配置</h5>
-                  <p className="text-slate-400 text-sm leading-relaxed">风险平价方法，旨在通胀、紧缩和增长等不同经济周期中均能稳健表现。</p>
-                </div>
+              <div className="flex flex-col gap-8">
+                <StrategyCard 
+                  title="全球全天候配置"
+                  description="风险平价方法，旨在通胀、紧缩和增长等不同经济周期中均能稳健表现。通过跨资产类别对冲实现长期低回撤。"
+                  icon={Globe}
+                  riskLevel="低风险"
+                  riskColor="text-emerald-400"
+                  details="1. 核心理念：基于Ray Dalio的风险平价理论，不预测市场，而是平衡不同经济环境下的资产风险。\n2. 资产类别：涵盖全球股票、长期国债、中期国债、黄金及大宗商品。\n3. 模拟表现：在历史极端市场环境下表现出极强的韧性，回撤控制在极低水平。"
+                  chartData={[
+                    { name: 'M1', value: 100 }, { name: 'M2', value: 100.5 }, { name: 'M3', value: 101.2 }, { name: 'M4', value: 100.8 },
+                    { name: 'M5', value: 101.5 }, { name: 'M6', value: 102.1 }, { name: 'M7', value: 102.5 }, { name: 'M8', value: 103.2 },
+                  ]}
+                />
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Team Section */}
+        <section className="py-24 bg-[#1a1710]" id="team">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-20">
+              <h2 className="text-primary font-bold uppercase tracking-widest text-sm mb-3">核心团队</h2>
+              <h3 className="text-4xl font-bold text-white">睿典研究团队介绍</h3>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-12">
+              {[
+                {
+                  name: "睿典主理人",
+                  role: "创始人 / 首席策略师",
+                  bio: "硕士学位，CFA持证人。深耕美股与A股市场多年，擅长将宏观基本面研究与量化模型相结合，构建稳健的投资组合。",
+                  image: "https://picsum.photos/seed/leader/400/500"
+                },
+                {
+                  name: "林博士",
+                  role: "量化研究主管",
+                  bio: "数学博士，拥有深厚的统计建模背景。负责开发低波动套利模型与AI增强算法，致力于通过数据挖掘发现市场Alpha。",
+                  image: "https://picsum.photos/seed/quant/400/500"
+                },
+                {
+                  name: "陈分析师",
+                  role: "行业研究员",
+                  bio: "专注科技与新能源赛道研究。通过深入的产业链调研，为“主观多头”策略提供核心标的池，捕捉行业爆发性机会。",
+                  image: "https://picsum.photos/seed/analyst/400/500"
+                }
+              ].map((member, index) => (
+                <motion.div 
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="glass-panel overflow-hidden rounded-2xl border border-white/5 hover:border-primary/30 transition-all group"
+                >
+                  <div className="aspect-[4/5] overflow-hidden">
+                    <img 
+                      src={member.image} 
+                      alt={member.name} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 grayscale hover:grayscale-0"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                  <div className="p-8">
+                    <h4 className="text-2xl font-bold text-white mb-2">{member.name}</h4>
+                    <p className="text-primary text-sm font-bold uppercase tracking-widest mb-4">{member.role}</p>
+                    <p className="text-slate-400 text-sm leading-relaxed">
+                      {member.bio}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
@@ -244,15 +529,22 @@ export default function App() {
               <Users2 className="text-primary w-16 h-16 mx-auto mb-8" />
               <h2 className="text-4xl md:text-5xl font-black text-white mb-6">投资研究交流</h2>
               <p className="text-slate-300 text-lg leading-relaxed mb-10 max-w-2xl mx-auto">
-                睿典投资研究室致力于探索长期稳健的投资逻辑。欢迎志同道合、对量化研究与基本面分析感兴趣的朋友进行学术探讨与经验交流。
+                睿典：个人投资研究工作室致力于探索长期稳健的投资逻辑。欢迎志同道合、对低频量化研究与基本面分析感兴趣，尤其对交易本身感兴趣的朋友进行学术探讨与经验交流。
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-background-dark px-10 py-4 rounded-xl text-lg font-bold shadow-xl shadow-primary/20 transition-all">
-                  发送交流邮件
+                <button 
+                  onClick={() => setShowQR(true)}
+                  className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-background-dark px-10 py-4 rounded-xl text-lg font-bold shadow-xl shadow-primary/20 transition-all"
+                >
+                  联系交流
                 </button>
-                <button className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/20 px-10 py-4 rounded-xl text-lg font-bold backdrop-blur-sm transition-all">
+                <Link 
+                  to="/blog"
+                  target="_blank"
+                  className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/20 px-10 py-4 rounded-xl text-lg font-bold backdrop-blur-sm transition-all inline-flex items-center justify-center"
+                >
                   查看研究博客
-                </button>
+                </Link>
               </div>
               <p className="mt-12 text-slate-500 text-xs uppercase tracking-[0.2em] font-medium">
                 本站仅作为个人投资记录与研究展示，不构成任何投资建议
@@ -268,10 +560,10 @@ export default function App() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="flex items-center gap-3">
               <Landmark className="text-primary w-6 h-6" />
-              <span className="text-white font-bold text-lg">睿典投资研究室</span>
+              <span className="text-white font-bold text-lg">睿典：个人投资研究工作室</span>
             </div>
             <div className="text-slate-500 text-sm">
-              © 2024 张岩, CFA. 保留所有权利。个人投资研究展示。
+              © 2024 睿典：个人投资研究工作室. 保留所有权利。
             </div>
             <div className="flex gap-6">
               <a className="text-slate-400 hover:text-primary transition-colors" href="#"><Share2 className="w-5 h-5" /></a>

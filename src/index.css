@@ -4,8 +4,13 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --color-primary: #d9a630;
+  --color-primary-dim: #967220;
   --color-background-light: #f8f7f6;
   --color-background-dark: #201c12;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
