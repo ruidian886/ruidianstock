@@ -37,7 +37,6 @@ import {
   Legend
 } from 'recharts';
 import BlogPage from './BlogPage';
-import zhangyanImg from './assets/zhangyan.jpg';
 
 const StrategyCard = ({ 
   title, 
@@ -529,7 +528,7 @@ function LandingPage() {
               </div>
               <div className="aspect-square bg-white p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-inner mb-6">
                 <img 
-                  src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://ais-pre-lt6hbn46plprmskx2d2bgp-613917986540.asia-southeast1.run.app" 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${window.location.origin}`} 
                   alt="联系二维码" 
                   className="w-full h-full object-contain"
                   referrerPolicy="no-referrer"
@@ -634,7 +633,7 @@ function LandingPage() {
                   <img 
                     alt="张岩, CFA" 
                     className="w-full h-full object-cover" 
-                    src={zhangyanImg}
+                    src="/zhangyan.jpg"
                     referrerPolicy="no-referrer"
                   />
                 </div>
@@ -856,7 +855,7 @@ function LandingPage() {
                   name: "睿典主理人",
                   role: "创始人 / 首席策略师",
                   bio: "硕士学位，CFA持证人。深耕美股与A股市场多年，擅长将宏观基本面研究与量化模型相结合，构建稳健的投资组合。",
-                  image: zhangyanImg
+                  image: "/zhangyan.jpg"
                 },
                 {
                   name: "林博士",
