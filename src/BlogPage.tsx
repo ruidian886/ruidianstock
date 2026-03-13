@@ -118,7 +118,7 @@ export default function BlogPage() {
                 {tag}
                 {i === 0 && (
                   <motion.div 
-                    layoutId="activeTab" 
+                    layoutId="blogActiveTab" 
                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" 
                   />
                 )}

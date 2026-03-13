@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import { 
   Landmark, 
@@ -20,10 +20,14 @@ import {
   Brain,
   RefreshCw,
   ArrowUpDown,
+  ArrowLeft,
   ChevronDown,
   ChevronUp,
   X,
-  Calendar
+  Calendar,
+  Camera,
+  Upload,
+  Table
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -143,10 +147,9 @@ const StrategyCard = ({
   ];
 
   const moreRanges = [
-    { id: '2024', label: '2024' },
     { id: '2025', label: '2025' },
     { id: '2026', label: '2026' },
-    { id: 'custom', label: '自定义区间' },
+    { id: 'custom', label: '自定义' },
   ];
 
   return (
@@ -182,7 +185,7 @@ const StrategyCard = ({
                 <div className="space-y-3">
                   {details.split('\n').map((line, i) => (
                     <p key={i} className="text-slate-400 text-sm leading-relaxed flex gap-3">
-                      <span className="text-primary font-bold">{i + 1}.</span>
+                      <span className="text-slate-400 font-bold">{i + 1}.</span>
                       {line.replace(/^\d+\.\s*/, '')}
                     </p>
                   ))}
@@ -197,7 +200,7 @@ const StrategyCard = ({
           {/* Top Metrics Bar */}
           <div className="grid grid-cols-3 gap-4 mb-10">
             <div className="text-center lg:text-left">
-              <p className="text-primary text-2xl md:text-3xl font-black mb-1">{metrics?.totalReturn || "106.90%"}</p>
+              <p className="text-primary text-xl md:text-2xl font-black mb-1">{metrics?.totalReturn || "106.90%"}</p>
               <p className="text-slate-500 text-[10px] uppercase tracking-widest mb-2">
                 成立以来收益 ({(metrics?.inceptionDate || "2024-07-03").split('-')[0]}-2026)
               </p>
@@ -209,7 +212,7 @@ const StrategyCard = ({
               )}
             </div>
             <div className="text-center">
-              <p className="text-red-500 text-2xl md:text-3xl font-black mb-1">{metrics?.ytdReturn || "9.59%"}</p>
+              <p className="text-red-500 text-xl md:text-2xl font-black mb-1">{metrics?.ytdReturn || "9.59%"}</p>
               <p className="text-slate-500 text-[10px] uppercase tracking-widest mb-2">今年以来收益</p>
               {metrics?.alphaYtd && (
                 <div className="flex items-center gap-1 justify-center">
@@ -219,7 +222,7 @@ const StrategyCard = ({
               )}
             </div>
             <div className="text-center lg:text-right">
-              <p className="text-white text-2xl md:text-3xl font-black mb-1">{metrics?.nav || "2.0690"}</p>
+              <p className="text-white text-xl md:text-2xl font-black mb-1">{metrics?.nav || "2.0690"}</p>
               <p className="text-slate-500 text-[10px] uppercase tracking-widest">单位净值 (03-06)</p>
             </div>
           </div>
@@ -260,6 +263,92 @@ const StrategyCard = ({
               </button>
             ))}
           </div>
+          
+          {/* Time Range Selectors - Moved here to be always visible */}
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+            {timeRanges.map(range => (
+              <button
+                key={range.id}
+                onClick={() => setTimeRange(range.id)}
+                className={`px-4 py-1.5 rounded-full text-[11px] font-bold transition-all ${
+                  timeRange === range.id 
+                    ? 'bg-primary/20 text-primary border border-primary/30' 
+                    : 'bg-white/5 text-slate-500 border border-white/5 hover:bg-white/10'
+                }`}
+              >
+                {range.label}
+              </button>
+            ))}
+            <div className="relative">
+              <button
+                onClick={() => setShowMore(!showMore)}
+                className={`px-4 py-1.5 rounded-full text-[11px] font-bold transition-all flex items-center gap-1 ${
+                  moreRanges.some(r => r.id === timeRange)
+                    ? 'bg-primary/20 text-primary border border-primary/30' 
+                    : 'bg-white/5 text-slate-500 border border-white/5 hover:bg-white/10'
+                }`}
+              >
+                更多
+                <ChevronDown className={`w-3 h-3 transition-transform ${showMore ? 'rotate-180' : ''}`} />
+              </button>
+              <AnimatePresence>
+                {showMore && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full mt-2 left-0 w-32 bg-[#0f172a] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden"
+                  >
+                    {moreRanges.map(range => (
+                      <button
+                        key={range.id}
+                        onClick={() => {
+                          setTimeRange(range.id);
+                          setShowMore(false);
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-[11px] font-bold text-slate-400 hover:bg-white/5 hover:text-white transition-colors border-b border-white/5 last:border-0"
+                      >
+                        {range.label}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Custom Date Inputs - Moved here to be always visible when selected */}
+          <AnimatePresence>
+            {timeRange === 'custom' && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="flex items-center gap-3 mb-6 p-4 rounded-2xl bg-white/[0.02] border border-white/5"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">起始</span>
+                  <input 
+                    type="month" 
+                    value={customRange.start}
+                    onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })}
+                    className="bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-[11px] text-white focus:outline-none focus:border-primary/50 transition-colors"
+                  />
+                </div>
+                <div className="h-px w-4 bg-white/10" />
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">结束</span>
+                  <input 
+                    type="month" 
+                    value={customRange.end}
+                    onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })}
+                    className="bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-[11px] text-white focus:outline-none focus:border-primary/50 transition-colors"
+                  />
+                </div>
+                <Calendar className="w-4 h-4 text-primary ml-auto opacity-50" />
+              </motion.div>
+            )}
+          </AnimatePresence>
           
           <div className="flex-grow min-h-[250px] w-full mb-6">
             <ResponsiveContainer width="100%" height="100%">
@@ -353,121 +442,39 @@ const StrategyCard = ({
                 exit={{ opacity: 0, height: 0 }}
                 className="overflow-hidden"
               >
-                {/* Time Range Selectors */}
-                <div className="flex flex-wrap items-center gap-2 mb-4">
-                  {timeRanges.map(range => (
-                    <button
-                      key={range.id}
-                      onClick={() => setTimeRange(range.id)}
-                      className={`px-4 py-1.5 rounded-full text-[11px] font-bold transition-all ${
-                        timeRange === range.id 
-                          ? 'bg-primary/20 text-primary border border-primary/30' 
-                          : 'bg-white/5 text-slate-500 border border-white/5 hover:bg-white/10'
-                      }`}
-                    >
-                      {range.label}
-                    </button>
-                  ))}
-                  <div className="relative">
-                    <button
-                      onClick={() => setShowMore(!showMore)}
-                      className={`px-4 py-1.5 rounded-full text-[11px] font-bold transition-all flex items-center gap-1 ${
-                        moreRanges.some(r => r.id === timeRange)
-                          ? 'bg-primary/20 text-primary border border-primary/30' 
-                          : 'bg-white/5 text-slate-500 border border-white/5 hover:bg-white/10'
-                      }`}
-                    >
-                      更多
-                      <ChevronDown className={`w-3 h-3 transition-transform ${showMore ? 'rotate-180' : ''}`} />
-                    </button>
-                    <AnimatePresence>
-                      {showMore && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          className="absolute bottom-full mb-2 left-0 w-32 bg-[#0f172a] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden"
-                        >
-                          {moreRanges.map(range => (
-                            <button
-                              key={range.id}
-                              onClick={() => {
-                                setTimeRange(range.id);
-                                setShowMore(false);
-                              }}
-                              className="w-full text-left px-4 py-2.5 text-[11px] font-bold text-slate-400 hover:bg-white/5 hover:text-white transition-colors border-b border-white/5 last:border-0"
-                            >
-                              {range.label}
-                            </button>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-
-                {/* Custom Date Inputs */}
-                <AnimatePresence>
-                  {timeRange === 'custom' && (
-                    <motion.div 
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="flex items-center gap-3 mb-10 p-4 rounded-2xl bg-white/[0.02] border border-white/5"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">起始</span>
-                        <input 
-                          type="month" 
-                          value={customRange.start}
-                          onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })}
-                          className="bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-[11px] text-white focus:outline-none focus:border-primary/50 transition-colors"
-                        />
-                      </div>
-                      <div className="h-px w-4 bg-white/10" />
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">结束</span>
-                        <input 
-                          type="month" 
-                          value={customRange.end}
-                          onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })}
-                          className="bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-[11px] text-white focus:outline-none focus:border-primary/50 transition-colors"
-                        />
-                      </div>
-                      <Calendar className="w-4 h-4 text-primary ml-auto opacity-50" />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
                 {/* Period Returns Table */}
                 <div className="mt-auto">
                   <div className="flex justify-between items-center mb-4">
-                    <h6 className="text-white font-bold text-[10px] uppercase tracking-widest opacity-60">区间涨幅对比</h6>
-                    <span className="text-[10px] text-slate-600 uppercase tracking-widest">数据更新于 2026-03-06</span>
+                    <h6 className="text-white font-bold text-[10px] uppercase tracking-widest opacity-60">区间涨幅</h6>
                   </div>
-                  <div className="grid grid-cols-4 gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 px-2">
+                  <div className="grid grid-cols-5 gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 px-2">
                     <div className="col-span-1">区间</div>
-                    <div className="text-right">本基金</div>
-                    <div className="text-right">中证1000</div>
-                    <div className="text-right">超额收益</div>
+                    <div className="text-right">区间涨幅</div>
+                    <div className="text-right flex items-center justify-end gap-0.5">
+                      中证800 <ChevronDown className="w-2 h-2" />
+                    </div>
+                    <div className="text-right">同类平均</div>
+                    <div className="text-right">同类排行</div>
                   </div>
                   <div className="space-y-1">
                     {(metrics?.periodReturns || [
-                      { period: "成立以来", fund: "106.90%", benchmark: "43.40%" },
-                      { period: "今年以来", fund: "9.59%", benchmark: "3.73%" },
+                      { period: "成立来", fund: "106.90%", benchmark: "43.40%" },
+                      { period: "今年来", fund: "9.59%", benchmark: "3.73%" },
+                      { period: "近一月", fund: "-0.81%", benchmark: "1.01%" },
+                      { period: "近三月", fund: "7.65%", benchmark: "5.90%" },
+                      { period: "近半年", fund: "15.26%", benchmark: "8.82%" },
                       { period: "近一年", fund: "43.98%", benchmark: "23.60%" }
                     ]).map((row, idx) => {
                       const fundVal = parseFloat(row.fund);
                       const benchVal = parseFloat(row.benchmark);
-                      const alphaValue = fundVal - benchVal;
-                      const alpha = (alphaValue > 0 ? "+" : "") + alphaValue.toFixed(2) + "%";
                       
                       return (
-                        <div key={idx} className="grid grid-cols-4 gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/5 items-center">
+                        <div key={idx} className="grid grid-cols-5 gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/5 items-center">
                           <div className="text-[11px] text-slate-300 font-medium">{row.period}</div>
                           <div className={`text-right text-[11px] font-bold ${fundVal >= 0 ? 'text-red-500' : 'text-emerald-500'}`}>{row.fund}</div>
-                          <div className="text-right text-[11px] font-bold text-slate-400">{row.benchmark}</div>
-                          <div className={`text-right text-[11px] font-bold ${alphaValue >= 0 ? 'text-primary' : 'text-slate-500'}`}>{alpha}</div>
+                          <div className={`text-right text-[11px] font-bold ${benchVal >= 0 ? 'text-red-500' : 'text-emerald-500'}`}>{row.benchmark}</div>
+                          <div className="text-right text-[11px] font-bold text-slate-400">--</div>
+                          <div className="text-right text-[11px] font-bold text-slate-400">--</div>
                         </div>
                       );
                     })}
@@ -493,6 +500,22 @@ export default function App() {
 
 function LandingPage() {
   const [showQR, setShowQR] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(() => {
+    return localStorage.getItem('zhangyan_profile_image');
+  });
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setProfileImage(base64String);
+        localStorage.setItem('zhangyan_profile_image', base64String);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div id="home" className="min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
@@ -534,7 +557,7 @@ function LandingPage() {
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <p className="text-slate-400 text-xs uppercase tracking-widest font-medium">睿典投资研究工作室</p>
+              <p className="text-slate-400 text-xs uppercase tracking-widest font-medium">沐熙一宸</p>
             </motion.div>
           </div>
         )}
@@ -549,16 +572,16 @@ function LandingPage() {
                 <Landmark className="text-primary w-8 h-8" />
               </div>
               <div>
-                <h2 className="text-white text-xl font-bold leading-tight tracking-tight">睿典：个人投资研究工作室</h2>
-                <p className="text-primary text-[10px] uppercase tracking-[0.2em] font-semibold">个人投资研究展示</p>
+                <h2 className="text-white text-xl font-bold leading-tight tracking-tight">沐熙一宸</h2>
+                <p className="text-primary text-[10px] uppercase tracking-[0.2em] font-semibold">一心守道，宸揽全局</p>
               </div>
             </div>
             <nav className="hidden md:flex items-center gap-10">
               <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#home">首页</a>
-              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#about">关于主理人</a>
-              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#strategies">策略研究</a>
-              <Link className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" to="/blog" target="_blank">研究博客</Link>
-              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#contact">交流探讨</a>
+              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#principal-page">关于主理人</a>
+              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#strategy-research-page">策略研究</a>
+              <Link className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" to="/blog">研究博客</Link>
+              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#discussion-page">交流探讨</a>
               <button 
                 onClick={() => setShowQR(true)}
                 className="bg-primary hover:bg-primary/90 text-background-dark px-6 py-2.5 rounded-lg text-sm font-bold transition-all transform hover:scale-105 active:scale-95 inline-flex items-center justify-center"
@@ -594,7 +617,7 @@ function LandingPage() {
                 个人投资策略展示 / 教育交流，不提供个性化建议，用户独立决策自担风险
               </div>
               <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.1] mb-6 tracking-tight">
-                睿典：<br/><span className="text-primary">个人投资研究工作室</span>
+                沐熙一宸：<br/><span className="text-primary text-4xl md:text-5xl">个人股票投资研究室</span>
               </h1>
               <p className="text-lg md:text-xl text-slate-300 leading-relaxed mb-10 font-light">
                 专注于全球股票市场的数据驱动研究与策略探索 <br className="hidden md:block"/>
@@ -602,16 +625,16 @@ function LandingPage() {
               </p>
               <div className="flex flex-wrap gap-4">
                 <a 
-                  href="#strategies"
+                  href="#strategy-research-page"
                   className="bg-primary hover:bg-primary/90 text-background-dark px-8 py-4 rounded-xl text-base font-bold transition-all shadow-lg shadow-primary/20 inline-flex items-center justify-center whitespace-nowrap"
                 >
                   探索策略研究
                 </a>
                 <a 
-                  href="#team" 
+                  href="#principal-page" 
                   className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-xl text-base font-bold backdrop-blur-sm transition-all inline-flex items-center justify-center"
                 >
-                  关于睿典
+                  关于沐熙一宸
                 </a>
               </div>
             </motion.div>
@@ -619,7 +642,7 @@ function LandingPage() {
         </section>
 
         {/* About Section */}
-        <section className="py-24 bg-background-light dark:bg-background-dark border-y border-primary-dim/5" id="about">
+        <section className="py-24 bg-background-light dark:bg-background-dark border-y border-primary-dim/5" id="principal-page">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <motion.div 
@@ -629,23 +652,41 @@ function LandingPage() {
                 className="relative"
               >
                 <div className="absolute -inset-4 bg-primary-dim/20 rounded-2xl blur-2xl opacity-20"></div>
-                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/5 shadow-2xl">
-                  <img 
-                    alt="张岩, CFA" 
-                    className="w-full h-full object-cover" 
-                    src="/zhangyan.jpg"
-                    referrerPolicy="no-referrer"
-                  />
+                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/5 shadow-2xl bg-primary-dim/10 flex items-center justify-center group">
+                  {profileImage ? (
+                    <img 
+                      alt="张岩, CFA" 
+                      className="w-full h-full object-cover" 
+                      src={profileImage}
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center gap-4 text-primary-dim/40">
+                      <Users2 className="w-20 h-20" />
+                      <span className="text-sm font-medium">点击上传主理人照片</span>
+                    </div>
+                  )}
+                  
+                  {/* Upload Overlay */}
+                  <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer text-white gap-2">
+                    <Camera className="w-8 h-8" />
+                    <span className="text-sm font-bold">{profileImage ? '更换照片' : '上传照片'}</span>
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                    />
+                  </label>
                 </div>
               </motion.div>
               <div className="space-y-8">
                 <div>
-                  <h2 className="text-primary-dim font-bold uppercase tracking-widest text-sm mb-3">关于主理人</h2>
+                  <h2 className="text-primary-dim font-bold uppercase tracking-widest text-sm mb-3">主理人页面</h2>
                   <h3 className="text-3xl md:text-4xl font-bold text-primary-dim mb-6 leading-tight">
                     主理人：硕士 & CFA
                   </h3>
                   <p className="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
-                    睿典投资研究工作室致力于将严谨的数据驱动方法与深入的基本面研究相结合。主理人常驻深圳金融枢纽，深耕美股和A股市场，凭借硕士学位和特许金融分析师（CFA）资格，致力于将定量精准度与定性洞察力应用于个人投资实践与策略探索。
+                    沐熙一宸致力于将严谨的数据驱动方法与深入的基本面研究相结合。主理人常驻深圳金融枢纽，深耕美股和A股市场，凭借硕士学位和特许金融分析师（CFA）资格，致力于将定量精准度与定性洞察力应用于个人投资实践与策略探索。
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -674,11 +715,11 @@ function LandingPage() {
         </section>
 
         {/* Strategies Section */}
-        <section className="py-24 bg-[#1a1710]" id="strategies">
+        <section className="py-24 bg-[#1a1710]" id="strategy-research-page">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-20">
               <h2 className="text-primary font-bold uppercase tracking-widest text-sm mb-3">研究框架</h2>
-              <h3 className="text-4xl font-bold text-white">个人策略研究展示</h3>
+              <h3 className="text-4xl font-bold text-white">个人策略研究页面</h3>
             </div>
             
             {/* Live Strategies */}
@@ -694,7 +735,9 @@ function LandingPage() {
                   icon={ArrowUpDown}
                   riskLevel="中高风险"
                   riskColor="text-primary"
-                  details="1. 策略逻辑：基于统计套利原理，捕捉市场微观结构中的定价偏差。\n2. 选股模型：多因子量化选股，重点关注流动性、波动率及反转因子。\n3. 风险控制：严格的下行保护机制，通过动态对冲降低组合波动。"
+                  details={`1. 策略逻辑：基于统计套利原理，捕捉市场微观结构中的定价偏差。
+2. 选股模型：多因子量化选股，重点关注流动性、波动率及反转因子。
+3. 风险控制：严格的下行保护机制，通过动态对冲降低组合波动。`}
                   chartData={[
                     { name: '24-07', value: 100, benchmark: 100, a500: 100, alpha: 0 },
                     { name: '24-08', value: 102.5, benchmark: 101.2, a500: 100.8, alpha: 1.3 },
@@ -723,8 +766,8 @@ function LandingPage() {
                     alphaTotal: "+57.70%",
                     alphaYtd: "+5.86%",
                     periodReturns: [
-                      { period: "成立以来", fund: "106.90%", benchmark: "43.40%" },
-                      { period: "今年以来", fund: "9.59%", benchmark: "3.73%" },
+                      { period: "成立来", fund: "106.90%", benchmark: "43.40%" },
+                      { period: "今年来", fund: "9.59%", benchmark: "3.73%" },
                       { period: "近一月", fund: "-0.81%", benchmark: "1.01%" },
                       { period: "近三月", fund: "7.65%", benchmark: "5.90%" },
                       { period: "近半年", fund: "15.26%", benchmark: "8.82%" },
@@ -738,7 +781,9 @@ function LandingPage() {
                   icon={Brain}
                   riskLevel="中高风险"
                   riskColor="text-primary"
-                  details="1. 主观部分：深耕基本面研究，捕捉行业趋势及题材热点。\n2. 量化部分：AI算法辅助日内交易（做T），优化买卖点，提升持仓收益。\n3. 核心优势：结合人的洞察力与机器的执行力，实现超额收益最大化。"
+                  details={`1. 主观部分：深耕基本面研究，捕捉行业趋势及题材热点。
+2. 量化部分：AI算法辅助日内交易（做T），优化买卖点，提升持仓收益。
+3. 核心优势：结合人的洞察力与机器的执行力，实现超额收益最大化。`}
                   chartData={[
                     { name: '24-07', value: 100, benchmark: 100, a500: 100, alpha: 0 },
                     { name: '24-08', value: 105, benchmark: 101.2, a500: 100.5, alpha: 3.8 },
@@ -759,8 +804,11 @@ function LandingPage() {
                     alphaTotal: "+81.60%",
                     alphaYtd: "+7.67%",
                     periodReturns: [
-                      { period: "成立以来", fund: "125.00%", benchmark: "43.40%" },
-                      { period: "今年以来", fund: "11.40%", benchmark: "3.73%" },
+                      { period: "成立来", fund: "125.00%", benchmark: "43.40%" },
+                      { period: "今年来", fund: "11.40%", benchmark: "3.73%" },
+                      { period: "近一月", fund: "-0.50%", benchmark: "1.01%" },
+                      { period: "近三月", fund: "8.20%", benchmark: "5.90%" },
+                      { period: "近半年", fund: "18.50%", benchmark: "8.82%" },
                       { period: "近一年", fund: "58.20%", benchmark: "23.60%" }
                     ]
                   }}
@@ -771,7 +819,9 @@ function LandingPage() {
                   icon={RefreshCw}
                   riskLevel="中低风险"
                   riskColor="text-emerald-500"
-                  details="1. 轮动模型：基于动量、估值及宏观指标的多维打分系统。\n2. 资产配置：在全球及行业ETF间进行动态切换，规避弱势资产。\n3. 收益目标：通过赛道优选，在不同市场环境下获取稳健的超额收益。"
+                  details={`1. 轮动模型：基于动量、估值及宏观指标的多维打分系统；
+2. 资产配置：在全球及行业ETF间进行动态切换，规避弱势资产；
+3. 收益目标：通过赛道优选，在不同市场环境下获取稳健的超额收益。`}
                   chartData={[
                     { name: '24-07', value: 100, benchmark: 100, a500: 100, alpha: 0 },
                     { name: '24-08', value: 102, benchmark: 101.2, a500: 100.8, alpha: 0.8 },
@@ -792,8 +842,11 @@ function LandingPage() {
                     alphaTotal: "-3.20%",
                     alphaYtd: "-0.93%",
                     periodReturns: [
-                      { period: "成立以来", fund: "110.00%", benchmark: "43.40%" },
-                      { period: "今年以来", fund: "2.80%", benchmark: "3.73%" },
+                      { period: "成立来", fund: "110.00%", benchmark: "43.40%" },
+                      { period: "今年来", fund: "2.80%", benchmark: "3.73%" },
+                      { period: "近一月", fund: "-1.20%", benchmark: "1.01%" },
+                      { period: "近三月", fund: "3.50%", benchmark: "5.90%" },
+                      { period: "近半年", fund: "7.80%", benchmark: "8.82%" },
                       { period: "近一年", fund: "15.40%", benchmark: "23.60%" }
                     ]
                   }}
@@ -814,7 +867,9 @@ function LandingPage() {
                   icon={Globe}
                   riskLevel="低风险"
                   riskColor="text-emerald-400"
-                  details="1. 核心理念：基于Ray Dalio的风险平价理论，不预测市场，而是平衡不同经济环境下的资产风险。\n2. 资产类别：涵盖全球股票、长期国债、中期国债、黄金及大宗商品。\n3. 模拟表现：在历史极端市场环境下表现出极强的韧性，回撤控制在极低水平。"
+                  details={`1. 核心理念：基于Ray Dalio的风险平价理论，不预测市场，而是平衡不同经济环境下的资产风险。
+2. 资产类别：涵盖全球股票、长期国债、中期国债、黄金及大宗商品。
+3. 模拟表现：在历史极端市场环境下表现出极强的韧性，回撤控制在极低水平。`}
                   chartData={[
                     { name: 'M1', value: 100, benchmark: 100, a500: 100 }, { name: 'M2', value: 100.5, benchmark: 100.2, a500: 100.3 }, 
                     { name: 'M3', value: 101.2, benchmark: 100.8, a500: 101.0 }, { name: 'M4', value: 100.8, benchmark: 101.5, a500: 101.2 },
@@ -831,8 +886,12 @@ function LandingPage() {
                     alphaTotal: "+0.40%",
                     alphaYtd: "+0.20%",
                     periodReturns: [
-                      { period: "模拟以来", fund: "3.20%", benchmark: "2.80%" },
-                      { period: "今年以来", fund: "1.50%", benchmark: "1.30%" }
+                      { period: "模拟来", fund: "3.20%", benchmark: "2.80%" },
+                      { period: "今年来", fund: "1.50%", benchmark: "1.30%" },
+                      { period: "近一月", fund: "0.40%", benchmark: "0.30%" },
+                      { period: "近三月", fund: "1.20%", benchmark: "1.00%" },
+                      { period: "近半年", fund: "2.50%", benchmark: "2.10%" },
+                      { period: "近一年", fund: "3.20%", benchmark: "2.80%" }
                     ]
                   }}
                 />
@@ -846,28 +905,30 @@ function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-20">
               <h2 className="text-primary font-bold uppercase tracking-widest text-sm mb-3">核心团队</h2>
-              <h3 className="text-4xl font-bold text-white">睿典研究团队介绍</h3>
+              <h3 className="text-4xl font-bold text-white">团队介绍</h3>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-12">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
                 {
-                  name: "睿典主理人",
-                  role: "创始人 / 首席策略师",
-                  bio: "硕士学位，CFA持证人。深耕美股与A股市场多年，擅长将宏观基本面研究与量化模型相结合，构建稳健的投资组合。",
-                  image: "/zhangyan.jpg"
-                },
-                {
-                  name: "林博士",
+                  name: "林博士 (Dr. Lin)",
                   role: "量化研究主管",
-                  bio: "数学博士，拥有深厚的统计建模背景。负责开发低波动套利模型与AI增强算法，致力于通过数据挖掘发现市场Alpha。",
-                  image: "https://picsum.photos/seed/quant/400/500"
+                  bio: "数学博士，拥有深厚的统计建模背景。负责开发低波动套利模型与AI增强算法，致力于通过数据挖掘发现市场Alpha。"
                 },
                 {
-                  name: "陈分析师",
+                  name: "陈分析师 (Analyst Chen)",
                   role: "行业研究员",
-                  bio: "专注科技与新能源赛道研究。通过深入的产业链调研，为“主观多头”策略提供核心标的池，捕捉行业爆发性机会。",
-                  image: "https://picsum.photos/seed/analyst/400/500"
+                  bio: "专注科技与新能源赛道研究。通过深入的产业链调研，为策略提供核心标的池，捕捉行业爆发性机会。"
+                },
+                {
+                  name: "AI Agent 研报解读专员",
+                  role: "AI Agent Specialist",
+                  bio: "利用先进的AI技术实时处理海量研报信息，提取核心逻辑与关键数据，提升研究效率。"
+                },
+                {
+                  name: "AI 宏观分析师",
+                  role: "AI Macro Analyst",
+                  bio: "基于大数据与机器学习算法，构建宏观经济预测模型，为资产配置提供前瞻性指引。"
                 }
               ].map((member, index) => (
                 <motion.div 
@@ -876,23 +937,13 @@ function LandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="glass-panel overflow-hidden rounded-2xl border border-white/5 hover:border-primary/30 transition-all group"
+                  className="glass-panel overflow-hidden rounded-2xl border border-white/5 hover:border-primary/30 transition-all group p-8"
                 >
-                  <div className="aspect-[4/5] overflow-hidden">
-                    <img 
-                      src={member.image} 
-                      alt={member.name} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                  <div className="p-8">
-                    <h4 className="text-2xl font-bold text-white mb-2">{member.name}</h4>
-                    <p className="text-primary text-sm font-bold uppercase tracking-widest mb-4">{member.role}</p>
-                    <p className="text-slate-400 text-sm leading-relaxed">
-                      {member.bio}
-                    </p>
-                  </div>
+                  <h4 className="text-xl font-bold text-white mb-2">{member.name}</h4>
+                  <p className="text-primary text-[10px] font-bold uppercase tracking-widest mb-4">{member.role}</p>
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    {member.bio}
+                  </p>
                 </motion.div>
               ))}
             </div>
@@ -900,7 +951,7 @@ function LandingPage() {
         </section>
 
         {/* CTA / Future Fund Section */}
-        <section className="py-12 relative overflow-hidden" id="contact">
+        <section className="py-12 relative overflow-hidden" id="discussion-page">
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-primary/10 mix-blend-overlay"></div>
             <img 
@@ -918,9 +969,10 @@ function LandingPage() {
               className="glass-panel p-8 md:p-10 rounded-3xl border-primary/20 shadow-2xl"
             >
               <Users2 className="text-primary w-10 h-10 mx-auto mb-5" />
-              <h2 className="text-2xl md:text-3xl font-black text-white mb-3">投资研究交流</h2>
+              <h2 className="text-2xl md:text-3xl font-black text-white mb-1">投资研究交流页面</h2>
+              <p className="text-primary text-xs uppercase tracking-[0.3em] font-bold mb-5">一心守道，宸揽全局</p>
               <p className="text-slate-300 text-sm leading-relaxed mb-6 max-w-lg mx-auto">
-                睿典：个人投资研究工作室致力于探索长期稳健的投资逻辑。欢迎志同道合、对低频量化研究与基本面分析感兴趣，尤其对交易本身感兴趣的朋友进行学术探讨与经验交流。
+                沐熙一宸致力于探索长期稳健的投资逻辑。欢迎志同道合、对低频量化研究与基本面分析感兴趣，尤其对交易本身感兴趣的朋友进行学术探讨与经验交流。
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <button 
@@ -931,7 +983,6 @@ function LandingPage() {
                 </button>
                 <Link 
                   to="/blog"
-                  target="_blank"
                   className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/20 px-6 py-2.5 rounded-xl text-sm font-bold backdrop-blur-sm transition-all inline-flex items-center justify-center"
                 >
                   查看研究博客
@@ -951,10 +1002,10 @@ function LandingPage() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="flex items-center gap-3">
               <Landmark className="text-primary w-6 h-6" />
-              <span className="text-white font-bold text-lg">睿典：个人投资研究工作室</span>
+              <span className="text-white font-bold text-lg">沐熙一宸</span>
             </div>
             <div className="text-slate-500 text-sm">
-              © 2024 睿典：个人投资研究工作室. 保留所有权利。
+              © 2024 沐熙一宸. 保留所有权利。
             </div>
             <div className="flex gap-6">
               <a className="text-slate-400 hover:text-primary transition-colors" href="#"><Share2 className="w-5 h-5" /></a>
