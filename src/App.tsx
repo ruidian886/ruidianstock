@@ -503,7 +503,7 @@ function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const [profileImage] = useState<string | null>(() => {
-    return localStorage.getItem('zhangyan_profile_image') || '/name.jpeg';
+    return '/name.jpeg';
   });
 
   // Handle hash scroll on mount and hash change
