@@ -503,7 +503,7 @@ function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const [profileImage] = useState<string | null>(() => {
-    return localStorage.getItem('zhangyan_profile_image') || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800';
+    return localStorage.getItem('zhangyan_profile_image') || '/name.jpeg';
   });
 
   // Handle hash scroll on mount and hash change
@@ -687,7 +687,7 @@ function LandingPage() {
                   <img 
                     alt="主理人" 
                     className="w-full h-full object-cover" 
-                    src={profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800'}
+                    src={profileImage || '/name.jpeg'}
                     referrerPolicy="no-referrer"
                   />
                 </div>
