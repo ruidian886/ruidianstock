@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { 
   Landmark, 
   Verified, 
@@ -383,7 +383,7 @@ const StrategyCard = ({
                     iconSize={8}
                     wrapperStyle={{ paddingBottom: '20px', fontSize: '10px', fontWeight: 'bold' }}
                   />
-                  <Line name="本基金" type="monotone" dataKey="value" stroke="#F27D26" strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
+                  <Line name="本策略" type="monotone" dataKey="value" stroke="#F27D26" strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
                   {chartData[0].a500 !== undefined && (
                     <Line name="A500" type="monotone" dataKey="a500" stroke="#94a3b8" strokeWidth={2} dot={false} strokeDasharray="3 3" />
                   )}
@@ -418,7 +418,7 @@ const StrategyCard = ({
                     iconSize={8}
                     wrapperStyle={{ paddingBottom: '20px', fontSize: '10px', fontWeight: 'bold' }}
                   />
-                  <Line name="本基金回撤" type="stepAfter" dataKey="value" stroke="#ef4444" strokeWidth={2} dot={false} />
+                  <Line name="本策略回撤" type="stepAfter" dataKey="value" stroke="#ef4444" strokeWidth={2} dot={false} />
                 </LineChart>
               )}
             </ResponsiveContainer>
@@ -500,70 +500,36 @@ export default function App() {
 
 function LandingPage() {
   const [showQR, setShowQR] = useState(false);
-  const [profileImage, setProfileImage] = useState<string | null>(() => {
-    return localStorage.getItem('zhangyan_profile_image');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const [profileImage] = useState<string | null>(() => {
+    return localStorage.getItem('zhangyan_profile_image') || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800';
   });
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setProfileImage(base64String);
-        localStorage.setItem('zhangyan_profile_image', base64String);
-      };
-      reader.readAsDataURL(file);
+  // Handle hash scroll on mount and hash change
+  useEffect(() => {
+    const hash = location.hash;
+    if (hash) {
+      // Small delay to ensure content is rendered
+      const timer = setTimeout(() => {
+        const id = hash.replace('#', '');
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+      return () => clearTimeout(timer);
     }
-  };
+  }, [location]);
+
+  const navLinks = [
+    { name: '首页', href: '#home' },
+    { name: '关于主理人', href: '#principal-page' },
+    { name: '策略研究', href: '#strategy-research-page' },
+  ];
 
   return (
     <div id="home" className="min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
-      {/* QR Code Modal */}
-      <AnimatePresence>
-        {showQR && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowQR(false)}
-              className="absolute inset-0 bg-background-dark/90 backdrop-blur-sm"
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-2xl max-w-sm w-full text-center border border-primary/20"
-            >
-              <button 
-                onClick={() => setShowQR(false)}
-                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-primary transition-colors"
-              >
-                <X className="w-6 h-6" />
-              </button>
-              <div className="mb-6">
-                <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Landmark className="text-primary w-10 h-10" />
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">联系交流</h3>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">扫描下方二维码添加微信进行探讨</p>
-              </div>
-              <div className="aspect-square bg-white p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-inner mb-6">
-                <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${window.location.origin}`} 
-                  alt="联系二维码" 
-                  className="w-full h-full object-contain"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <p className="text-slate-400 text-xs uppercase tracking-widest font-medium">沐熙一宸</p>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Top Navigation Bar */}
       <header className="sticky top-0 z-50 w-full border-b border-primary/10 bg-background-dark/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
@@ -572,25 +538,79 @@ function LandingPage() {
                 <Landmark className="text-primary w-8 h-8" />
               </div>
               <div>
-                <h2 className="text-white text-xl font-bold leading-tight tracking-tight">沐熙一宸</h2>
-                <p className="text-primary text-[10px] uppercase tracking-[0.2em] font-semibold">一心守道，宸揽全局</p>
+                <h2 className="text-white text-xl font-bold leading-tight tracking-tight">锐典</h2>
+                <p className="text-primary text-[10px] uppercase tracking-[0.2em] font-semibold">锐取有道，典致投资</p>
               </div>
             </div>
+            
+            {/* Desktop Nav */}
             <nav className="hidden md:flex items-center gap-10">
-              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#home">首页</a>
-              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#principal-page">关于主理人</a>
-              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#strategy-research-page">策略研究</a>
+              {navLinks.map((link) => (
+                <a 
+                  key={link.name}
+                  className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" 
+                  href={link.href}
+                >
+                  {link.name}
+                </a>
+              ))}
               <Link className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" to="/blog">研究博客</Link>
-              <a className="text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#discussion-page">交流探讨</a>
-              <button 
-                onClick={() => setShowQR(true)}
+              <a 
+                href="#discussion-page"
                 className="bg-primary hover:bg-primary/90 text-background-dark px-6 py-2.5 rounded-lg text-sm font-bold transition-all transform hover:scale-105 active:scale-95 inline-flex items-center justify-center"
               >
                 联系交流
-              </button>
+              </a>
             </nav>
+
+            {/* Mobile Menu Toggle */}
+            <button 
+              className="md:hidden p-2 text-slate-300 hover:text-primary transition-colors"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Table className="w-6 h-6" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-background-dark border-b border-primary/10 overflow-hidden"
+            >
+              <div className="px-4 py-6 space-y-4">
+                {navLinks.map((link) => (
+                  <a 
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block text-slate-300 hover:text-primary text-lg font-medium py-2"
+                  >
+                    {link.name}
+                  </a>
+                ))}
+                <Link 
+                  to="/blog" 
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block text-slate-300 hover:text-primary text-lg font-medium py-2"
+                >
+                  研究博客
+                </Link>
+                <a 
+                  href="#discussion-page"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block w-full bg-primary text-background-dark text-center py-3 rounded-xl font-bold mt-4"
+                >
+                  联系交流
+                </a>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       <main>
@@ -617,24 +637,35 @@ function LandingPage() {
                 个人投资策略展示 / 教育交流，不提供个性化建议，用户独立决策自担风险
               </div>
               <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.1] mb-6 tracking-tight">
-                沐熙一宸：<br/><span className="text-primary text-4xl md:text-5xl">个人股票投资研究室</span>
+                锐典：<br/><span className="text-primary text-4xl md:text-5xl">个人股票投资研究室</span>
               </h1>
-              <p className="text-lg md:text-xl text-slate-300 leading-relaxed mb-10 font-light">
-                专注于全球股票市场的数据驱动研究与策略探索 <br className="hidden md:block"/>
-                <span className="text-primary font-medium">主理人：硕士，CFA | 美股与A股市场研究者 | 操盘实战者</span>
-              </p>
+              <div className="text-lg md:text-xl text-slate-300 leading-relaxed mb-10 font-light">
+                专注于全球股票市场的数据驱动研究与策略探索
+                <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm md:text-base">
+                  <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-[10px] md:text-xs font-bold uppercase tracking-widest border border-primary/30">主理人</span>
+                  <div className="flex flex-wrap items-center gap-x-2 text-slate-100 font-normal">
+                    <span>硕士, CFA, 深圳高材</span>
+                    <span className="text-slate-600 font-thin">/</span>
+                    <span>A股与美股研究人</span>
+                    <span className="text-slate-600 font-thin">/</span>
+                    <span>操盘实战者</span>
+                    <span className="text-slate-600 font-thin">/</span>
+                    <span>专业和交易力保持者</span>
+                  </div>
+                </div>
+              </div>
               <div className="flex flex-wrap gap-4">
                 <a 
-                  href="#strategy-research-page"
+                  href="/#strategy-research-page"
                   className="bg-primary hover:bg-primary/90 text-background-dark px-8 py-4 rounded-xl text-base font-bold transition-all shadow-lg shadow-primary/20 inline-flex items-center justify-center whitespace-nowrap"
                 >
                   探索策略研究
                 </a>
                 <a 
-                  href="#principal-page" 
+                  href="/#principal-page" 
                   className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-xl text-base font-bold backdrop-blur-sm transition-all inline-flex items-center justify-center"
                 >
-                  关于沐熙一宸
+                  关于 锐典
                 </a>
               </div>
             </motion.div>
@@ -642,7 +673,7 @@ function LandingPage() {
         </section>
 
         {/* About Section */}
-        <section className="py-24 bg-background-light dark:bg-background-dark border-y border-primary-dim/5" id="principal-page">
+        <section className="py-24 bg-background-light dark:bg-background-dark border-y border-primary-dim/5 scroll-mt-20" id="principal-page">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <motion.div 
@@ -652,41 +683,23 @@ function LandingPage() {
                 className="relative"
               >
                 <div className="absolute -inset-4 bg-primary-dim/20 rounded-2xl blur-2xl opacity-20"></div>
-                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/5 shadow-2xl bg-primary-dim/10 flex items-center justify-center group">
-                  {profileImage ? (
-                    <img 
-                      alt="张岩, CFA" 
-                      className="w-full h-full object-cover" 
-                      src={profileImage}
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center gap-4 text-primary-dim/40">
-                      <Users2 className="w-20 h-20" />
-                      <span className="text-sm font-medium">点击上传主理人照片</span>
-                    </div>
-                  )}
-                  
-                  {/* Upload Overlay */}
-                  <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer text-white gap-2">
-                    <Camera className="w-8 h-8" />
-                    <span className="text-sm font-bold">{profileImage ? '更换照片' : '上传照片'}</span>
-                    <input 
-                      type="file" 
-                      className="hidden" 
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                    />
-                  </label>
+                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/5 shadow-2xl bg-primary-dim/10 flex items-center justify-center">
+                  <img 
+                    alt="主理人" 
+                    className="w-full h-full object-cover" 
+                    src={profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800'}
+                    referrerPolicy="no-referrer"
+                  />
                 </div>
               </motion.div>
               <div className="space-y-8">
                 <div>
                   <h2 className="text-primary-dim font-bold uppercase tracking-widest text-sm mb-3">主理人页面</h2>
                   <h3 className="text-3xl md:text-4xl font-bold text-primary-dim mb-6 leading-tight">
-                    主理人：硕士 & CFA
+                    主理人：硕士, CFA, 深圳高材
                   </h3>
                   <p className="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
-                    沐熙一宸致力于将严谨的数据驱动方法与深入的基本面研究相结合。主理人常驻深圳金融枢纽，深耕美股和A股市场，凭借硕士学位和特许金融分析师（CFA）资格，致力于将定量精准度与定性洞察力应用于个人投资实践与策略探索。
+                    锐典 致力于将严谨的数据驱动方法与深入的基本面研究相结合。主理人常驻深圳金融枢纽，深耕美股和A股市场，拥有硕士学位和特许金融分析师（CFA）资格。作为操盘实战者，致力于将专业研究与交易实战相结合，保持卓越的交易力。
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -715,7 +728,7 @@ function LandingPage() {
         </section>
 
         {/* Strategies Section */}
-        <section className="py-24 bg-[#1a1710]" id="strategy-research-page">
+        <section className="py-24 bg-[#1a1710] scroll-mt-20" id="strategy-research-page">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-20">
               <h2 className="text-primary font-bold uppercase tracking-widest text-sm mb-3">研究框架</h2>
@@ -951,7 +964,7 @@ function LandingPage() {
         </section>
 
         {/* CTA / Future Fund Section */}
-        <section className="py-12 relative overflow-hidden" id="discussion-page">
+        <section className="py-12 relative overflow-hidden scroll-mt-20" id="discussion-page">
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-primary/10 mix-blend-overlay"></div>
             <img 
@@ -970,9 +983,9 @@ function LandingPage() {
             >
               <Users2 className="text-primary w-10 h-10 mx-auto mb-5" />
               <h2 className="text-2xl md:text-3xl font-black text-white mb-1">投资研究交流页面</h2>
-              <p className="text-primary text-xs uppercase tracking-[0.3em] font-bold mb-5">一心守道，宸揽全局</p>
+              <p className="text-primary text-xs uppercase tracking-[0.3em] font-bold mb-5">锐取有道，典致投资</p>
               <p className="text-slate-300 text-sm leading-relaxed mb-6 max-w-lg mx-auto">
-                沐熙一宸致力于探索长期稳健的投资逻辑。欢迎志同道合、对低频量化研究与基本面分析感兴趣，尤其对交易本身感兴趣的朋友进行学术探讨与经验交流。
+                锐典 致力于探索长期稳健的投资逻辑。欢迎志同道合、对低频量化研究与基本面分析感兴趣，尤其对交易本身感兴趣的朋友进行学术探讨与经验交流。
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <button 
@@ -1002,10 +1015,21 @@ function LandingPage() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="flex items-center gap-3">
               <Landmark className="text-primary w-6 h-6" />
-              <span className="text-white font-bold text-lg">沐熙一宸</span>
+              <span className="text-white font-bold text-lg">锐典</span>
             </div>
             <div className="text-slate-500 text-sm">
-              © 2024 沐熙一宸. 保留所有权利。
+              © 2024 锐典. 保留所有权利。
+            </div>
+            <div className="flex flex-wrap justify-center gap-6">
+              {navLinks.map((link) => (
+                <a 
+                  key={link.name}
+                  href={link.href}
+                  className="text-slate-500 hover:text-primary text-xs font-medium transition-colors"
+                >
+                  {link.name}
+                </a>
+              ))}
             </div>
             <div className="flex gap-6">
               <a className="text-slate-400 hover:text-primary transition-colors" href="#"><Share2 className="w-5 h-5" /></a>
@@ -1018,6 +1042,50 @@ function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* QR Code Modal */}
+      <AnimatePresence>
+        {showQR && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowQR(false)}
+              className="absolute inset-0 bg-background-dark/90 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-2xl max-w-sm w-full text-center border border-primary/20"
+            >
+              <button 
+                onClick={() => setShowQR(false)}
+                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-primary transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <div className="mb-6">
+                <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Landmark className="text-primary w-10 h-10" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">联系交流</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">扫描下方二维码添加微信进行探讨</p>
+              </div>
+              <div className="aspect-square bg-white p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-inner mb-6">
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${window.location.origin}`} 
+                  alt="联系二维码" 
+                  className="w-full h-full object-contain"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+              <p className="text-slate-400 text-xs uppercase tracking-widest font-medium">锐典</p>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

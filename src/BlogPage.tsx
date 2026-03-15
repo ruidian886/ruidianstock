@@ -75,7 +75,17 @@ export default function BlogPage() {
             </Link>
             <div className="flex items-center gap-2">
               <Landmark className="w-5 h-5 text-slate-900" />
-              <span className="font-serif italic text-lg tracking-tight">Ruidian Research</span>
+              <span className="font-serif italic text-lg tracking-tight">锐典</span>
+            </div>
+            <div className="hidden md:flex items-center gap-8">
+              <a href="/#principal-page" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">关于主理人</a>
+              <a href="/#strategy-research-page" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">策略研究</a>
+              <a 
+                href="/#discussion-page"
+                className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-800 transition-all"
+              >
+                联系交流
+              </a>
             </div>
             <div className="flex items-center gap-4">
               <button className="p-2 text-slate-400 hover:text-slate-900 transition-colors">
@@ -192,10 +202,10 @@ export default function BlogPage() {
             <div className="space-y-6 max-w-sm">
               <div className="flex items-center gap-2">
                 <Landmark className="w-6 h-6 text-slate-900" />
-                <span className="font-serif italic text-xl">Ruidian Research</span>
+                <span className="font-serif italic text-xl">锐典</span>
               </div>
               <p className="text-slate-400 text-sm leading-relaxed">
-                专注于全球股票市场的数据驱动研究与策略探索。
+                锐取有道，典致投资。
                 本站仅作为个人投资记录与研究展示，不构成任何投资建议。
               </p>
             </div>
@@ -204,9 +214,10 @@ export default function BlogPage() {
               <div className="space-y-4">
                 <h4 className="text-xs font-bold uppercase tracking-widest text-slate-900">Navigation</h4>
                 <ul className="space-y-2 text-sm text-slate-500">
-                  <li><Link to="/" className="hover:text-blue-600 transition-colors">Home</Link></li>
-                  <li><Link to="/blog" className="hover:text-blue-600 transition-colors">Research Blog</Link></li>
-                  <li><a href="#" className="hover:text-blue-600 transition-colors">Strategies</a></li>
+                  <li><Link to="/" className="hover:text-blue-600 transition-colors">主页</Link></li>
+                  <li><Link to="/blog" className="hover:text-blue-600 transition-colors">研究博客</Link></li>
+                  <li><a href="/#strategy-research-page" className="hover:text-blue-600 transition-colors">策略研究</a></li>
+                  <li><a href="/#principal-page" className="hover:text-blue-600 transition-colors">关于主理人</a></li>
                 </ul>
               </div>
               <div className="space-y-4">
@@ -222,7 +233,7 @@ export default function BlogPage() {
           
           <div className="mt-20 pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-slate-400 text-[10px] uppercase tracking-widest font-medium">
-              © 2024 Ruidian Research Studio. All rights reserved.
+              © 2024 锐典. All rights reserved.
             </div>
             <div className="text-slate-300 text-[10px] uppercase tracking-widest font-medium">
               Designed for Clarity & Precision
