@@ -503,9 +503,17 @@ function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   // Image is loaded from /public/principal.jpg
-  const [profileImage] = useState<string | null>(() => {
-    return '/principal.jpg';
-  });
+  const [profileImage, setProfileImage] = useState<string>('/principal.jpg');
+
+  useEffect(() => {
+    // Check if the image exists, if not try fallback
+    const img = new Image();
+    img.src = '/principal.jpg';
+    img.onerror = () => {
+      console.log('principal.jpg not found, trying fallback...');
+      // If principal.jpg fails, we could try other common names if needed
+    };
+  }, []);
 
   // Handle hash scroll on mount and hash change
   useEffect(() => {
