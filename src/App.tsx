@@ -170,22 +170,22 @@ const StrategyCard = ({
               </div>
             </div>
             <h5 className="text-3xl font-bold text-white mb-6 tracking-tight leading-tight">{title}</h5>
-            <p className="text-slate-400 text-base leading-relaxed mb-8 font-light">{description}</p>
+            <p className="text-slate-400 text-lg leading-relaxed mb-8 font-light">{description}</p>
             
             <div className="space-y-6">
-              <div className="flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em]">
+              <div className="flex items-center gap-3 text-base font-bold uppercase tracking-[0.2em]">
                 <span className="text-slate-500">风险等级:</span>
                 <span className={`${riskColor} px-3 py-1 rounded-full bg-current/10 border border-current/20`}>{riskLevel}</span>
               </div>
               
               <div className="pt-8 border-t border-white/5">
-                <h6 className="text-white font-bold text-sm mb-4 flex items-center gap-2 uppercase tracking-widest opacity-60">
+                <h6 className="text-white font-bold text-base mb-4 flex items-center gap-2 uppercase tracking-widest opacity-60">
                   <FileText className="w-4 h-4 text-primary" />
                   策略核心逻辑
                 </h6>
                 <div className="space-y-3">
                   {details.split('\n').map((line, i) => (
-                    <p key={i} className="text-slate-400 text-sm leading-relaxed flex gap-3">
+                    <p key={i} className="text-slate-400 text-base leading-relaxed flex gap-3">
                       <span className="text-slate-400 font-bold">{i + 1}.</span>
                       {line.replace(/^\d+\.\s*/, '')}
                     </p>
@@ -202,48 +202,48 @@ const StrategyCard = ({
           <div className="grid grid-cols-3 gap-4 mb-10">
             <div className="text-center lg:text-left">
               <p className="text-primary text-xl md:text-2xl font-black mb-1">{metrics?.totalReturn || "106.90%"}</p>
-              <p className="text-slate-500 text-[10px] uppercase tracking-widest mb-2">
+              <p className="text-slate-500 text-xs uppercase tracking-widest mb-2">
                 成立以来收益 ({(metrics?.inceptionDate || "2024-07-03").split('-')[0]}-2026)
               </p>
               {metrics?.alphaTotal && (
                 <div className="flex items-center gap-1 justify-center lg:justify-start">
-                  <span className="text-[10px] text-slate-600 uppercase tracking-widest">超额(A500):</span>
-                  <span className="text-[11px] font-bold text-primary">{metrics.alphaTotal}</span>
+                  <span className="text-xs text-slate-600 uppercase tracking-widest">超额(A500):</span>
+                  <span className="text-sm font-bold text-primary">{metrics.alphaTotal}</span>
                 </div>
               )}
             </div>
             <div className="text-center">
               <p className="text-red-500 text-xl md:text-2xl font-black mb-1">{metrics?.ytdReturn || "9.59%"}</p>
-              <p className="text-slate-500 text-[10px] uppercase tracking-widest mb-2">今年以来收益</p>
+              <p className="text-slate-500 text-xs uppercase tracking-widest mb-2">今年以来收益</p>
               {metrics?.alphaYtd && (
                 <div className="flex items-center gap-1 justify-center">
-                  <span className="text-[10px] text-slate-600 uppercase tracking-widest">超额(A500):</span>
-                  <span className="text-[11px] font-bold text-primary">{metrics.alphaYtd}</span>
+                  <span className="text-xs text-slate-600 uppercase tracking-widest">超额(A500):</span>
+                  <span className="text-sm font-bold text-primary">{metrics.alphaYtd}</span>
                 </div>
               )}
             </div>
             <div className="text-center lg:text-right">
               <p className="text-white text-xl md:text-2xl font-black mb-1">{metrics?.nav || "2.0690"}</p>
-              <p className="text-slate-500 text-[10px] uppercase tracking-widest">单位净值 (03-06)</p>
+              <p className="text-slate-500 text-xs uppercase tracking-widest">单位净值 (03-06)</p>
             </div>
           </div>
 
           {/* Secondary Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10 py-6 border-y border-white/5">
             <div>
-              <p className="text-slate-500 text-[10px] uppercase tracking-widest mb-1">成立来年化</p>
+              <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">成立来年化</p>
               <p className="text-red-500 font-bold">{metrics?.annualizedReturn || "54.44%"}</p>
             </div>
             <div>
-              <p className="text-slate-500 text-[10px] uppercase tracking-widest mb-1">份额设立日</p>
+              <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">份额设立日</p>
               <p className="text-white font-bold">{metrics?.inceptionDate || "2024-07-03"}</p>
             </div>
             <div>
-              <p className="text-slate-500 text-[10px] uppercase tracking-widest mb-1">累计净值</p>
+              <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">累计净值</p>
               <p className="text-white font-bold">{metrics?.nav || "2.0690"}</p>
             </div>
             <div>
-              <p className="text-slate-500 text-[10px] uppercase tracking-widest mb-1">成立来夏普</p>
+              <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">成立来夏普</p>
               <p className="text-white font-bold">{metrics?.sharpeRatio || "2.04"}</p>
             </div>
           </div>
@@ -633,17 +633,17 @@ function LandingPage() {
               transition={{ duration: 0.8 }}
               className="max-w-2xl"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs md:text-sm font-bold mb-8 tracking-wide shadow-lg shadow-primary/5">
-                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-900/10 border border-red-900/20 text-red-800 dark:text-red-700 text-sm md:text-base font-bold mb-8 tracking-wide shadow-lg shadow-red-900/5">
+                <span className="w-2 h-2 rounded-full bg-red-800 animate-pulse" />
                 个人投资策略展示 / 教育交流，不提供个性化建议，用户独立决策自担风险
               </div>
               <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.1] mb-6 tracking-tight">
                 锐典：<br/><span className="text-primary text-4xl md:text-5xl">个人股票投资研究室</span>
               </h1>
-              <div className="text-lg md:text-xl text-slate-300 leading-relaxed mb-10 font-light">
+              <div className="text-xl md:text-2xl text-slate-300 leading-relaxed mb-10 font-light">
                 专注于全球股票市场的数据驱动研究与策略探索
-                <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm md:text-base">
-                  <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-[10px] md:text-xs font-bold uppercase tracking-widest border border-primary/30">主理人</span>
+                <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-base md:text-lg">
+                  <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-xs md:text-sm font-bold uppercase tracking-widest border border-primary/30">主理人</span>
                   <div className="flex flex-wrap items-center gap-x-2 text-slate-100 font-normal">
                     <span>硕士, CFA, 深圳高材</span>
                     <span className="text-slate-600 font-thin">/</span>
@@ -679,34 +679,39 @@ function LandingPage() {
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="space-y-8">
                 <div>
-                  <h2 className="text-primary-dim font-bold uppercase tracking-widest text-sm mb-3">主理人页面</h2>
-                  <h3 className="text-3xl md:text-4xl font-bold text-primary-dim mb-6 leading-tight">
+                  <h2 className="text-primary-dim font-bold uppercase tracking-widest text-base mb-3">主理人页面</h2>
+                  <h3 className="text-4xl md:text-5xl font-bold text-primary-dim mb-6 leading-tight">
                     主理人：硕士, CFA, 深圳高材
                   </h3>
-                  <p className="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
+                  <p className="text-slate-500 dark:text-slate-400 text-xl leading-relaxed">
                     锐典 致力于将严谨的数据驱动方法与深入的基本面研究相结合。主理人常驻深圳金融枢纽，深耕美股和A股市场，拥有硕士学位和特许金融分析师（CFA）资格。作为操盘实战者，致力于将专业研究与交易实战相结合，保持卓越的交易力。
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="p-6 rounded-xl bg-primary-dim/5 border border-primary-dim/10">
                     <School className="text-primary-dim w-8 h-8 mb-3" />
-                    <h4 className="text-slate-700 dark:text-white font-bold text-lg mb-1">硕士学位</h4>
-                    <p className="text-slate-400 dark:text-slate-400 text-sm">卓越的学术背景</p>
+                    <h4 className="text-slate-700 dark:text-white font-bold text-xl mb-1">硕士学位</h4>
+                    <p className="text-slate-400 dark:text-slate-400 text-base">卓越的学术背景</p>
                   </div>
                   <div className="p-6 rounded-xl bg-primary-dim/5 border border-primary-dim/10">
                     <Award className="text-primary-dim w-8 h-8 mb-3" />
-                    <h4 className="text-slate-700 dark:text-white font-bold text-lg mb-1">CFA 持证人</h4>
-                    <p className="text-slate-400 dark:text-slate-400 text-sm">金融行业黄金标准</p>
+                    <h4 className="text-slate-700 dark:text-white font-bold text-xl mb-1">CFA 持证人</h4>
+                    <p className="text-slate-400 dark:text-slate-400 text-base">金融行业黄金标准</p>
                   </div>
                   <div className="p-6 rounded-xl bg-primary-dim/5 border border-primary-dim/10">
                     <Zap className="text-primary-dim w-8 h-8 mb-3" />
-                    <h4 className="text-slate-700 dark:text-white font-bold text-lg mb-1">实战交易</h4>
-                    <p className="text-slate-400 dark:text-slate-400 text-sm">卓越的实盘执行能力</p>
+                    <h4 className="text-slate-700 dark:text-white font-bold text-xl mb-1">实战交易</h4>
+                    <p className="text-slate-400 dark:text-slate-400 text-base">卓越的实盘执行能力</p>
                   </div>
                 </div>
-                <button className="inline-flex items-center gap-2 text-primary-dim font-bold hover:underline">
+                <button className="inline-flex items-center gap-2 text-primary-dim font-bold hover:underline text-lg">
                   下载专业简历 <Download className="w-4 h-4" />
                 </button>
+                <div className="mt-6 pt-6 border-t border-primary-dim/10">
+                  <p className="text-slate-400 text-xs leading-relaxed italic">
+                    * 注：主理人所持有的 CFA 资格及硕士学位仅作为专业背景证明。本页面所有内容仅作为个人投资研究心得分享，不构成任何形式的投资建议或证券咨询服务。
+                  </p>
+                </div>
               </div>
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -732,15 +737,15 @@ function LandingPage() {
         <section className="py-24 bg-[#1a1710] scroll-mt-20" id="strategy-research-page">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-20">
-              <h2 className="text-primary font-bold uppercase tracking-widest text-sm mb-3">研究框架</h2>
-              <h3 className="text-4xl font-bold text-white">个人策略研究页面</h3>
+              <h2 className="text-primary font-bold uppercase tracking-widest text-base mb-3">研究框架</h2>
+              <h3 className="text-5xl font-bold text-white">个人策略研究页面</h3>
             </div>
             
             {/* Live Strategies */}
             <div className="mb-16">
               <div className="flex items-center gap-3 mb-8 border-l-4 border-primary pl-4">
                 <TrendingUp className="text-primary w-6 h-6" />
-                <h4 className="text-2xl font-bold text-white uppercase tracking-tight">实盘策略模型</h4>
+                <h4 className="text-3xl font-bold text-white uppercase tracking-tight">实盘策略模型</h4>
               </div>
               <div className="flex flex-col gap-8">
                 <StrategyCard 
@@ -910,6 +915,12 @@ function LandingPage() {
                   }}
                 />
               </div>
+              <div className="mt-12 p-6 rounded-2xl bg-white/5 border border-white/10 text-center">
+                <p className="text-slate-400 text-sm leading-relaxed max-w-3xl mx-auto">
+                  <span className="text-red-800 dark:text-red-700 font-bold mr-2">风险提示：</span>
+                  上述策略模型及业绩表现仅基于历史实盘数据或模拟回测展示，过往业绩不预示其未来表现，也不构成对未来收益的任何保证。市场有风险，投资需谨慎。本站不提供任何代客理财或承诺收益的金融服务。
+                </p>
+              </div>
             </div>
           </div>
         </section>
@@ -1018,7 +1029,7 @@ function LandingPage() {
               <Landmark className="text-primary w-6 h-6" />
               <span className="text-white font-bold text-lg">锐典</span>
             </div>
-            <div className="text-slate-500 text-sm">
+            <div className="text-slate-500 text-base">
               © 2024 锐典. 保留所有权利。
             </div>
             <div className="flex flex-wrap justify-center gap-6">
@@ -1026,7 +1037,7 @@ function LandingPage() {
                 <a 
                   key={link.name}
                   href={link.href}
-                  className="text-slate-500 hover:text-primary text-xs font-medium transition-colors"
+                  className="text-slate-500 hover:text-primary text-sm font-medium transition-colors"
                 >
                   {link.name}
                 </a>
@@ -1038,8 +1049,14 @@ function LandingPage() {
               <a className="text-slate-400 hover:text-primary transition-colors" href="#"><FileText className="w-5 h-5" /></a>
             </div>
           </div>
-          <div className="mt-12 text-center text-[10px] text-slate-700 leading-relaxed max-w-3xl mx-auto uppercase tracking-wider">
-            免责声明：股票市场投资涉及风险。过往业绩不代表未来表现。所提供信息仅用于专业教育及工作室组合跟踪，不构成财务建议。
+          <div className="mt-12 p-8 rounded-2xl bg-white/[0.02] border border-white/5">
+            <h4 className="text-red-800 dark:text-red-700 text-xs font-bold uppercase tracking-[0.3em] mb-4 text-center">法律声明与风险披露</h4>
+            <div className="text-center text-xs text-slate-600 leading-relaxed max-w-4xl mx-auto space-y-2">
+              <p>1. 本网站“锐典交易室”所载之全部内容（包括但不限于文字、图表、策略模型、研究报告等）仅供学习交流及个人投资记录之用，不构成任何意义上的投资建议、要约或承诺。</p>
+              <p>2. 证券市场投资具有极高风险。过往业绩（无论是实盘还是回测）均不代表未来表现。投资者应根据自身的风险承受能力、财务状况及投资目标独立作出决策，并自行承担全部风险。</p>
+              <p>3. 主理人展示的专业资格（如CFA）仅代表其个人专业素养，不代表受任何金融监管机构授权提供投资咨询服务。本站不从事任何非法证券业务，不提供保本收益承诺。</p>
+              <p>4. 访问本网站即视为您已阅读并同意上述条款。如您无法接受，请立即停止访问。</p>
+            </div>
           </div>
         </div>
       </footer>
@@ -1072,7 +1089,10 @@ function LandingPage() {
                   <Landmark className="text-primary w-10 h-10" />
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">联系交流</h3>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">扫描下方二维码添加微信进行探讨</p>
+                <p className="text-slate-500 dark:text-slate-400 text-base">扫描下方二维码添加微信进行探讨</p>
+                <div className="mt-2 text-xs text-amber-600 dark:text-amber-500/80 font-medium">
+                  * 仅限学术探讨与研究交流，不提供个股咨询
+                </div>
               </div>
               <div className="aspect-square bg-white p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-inner mb-6">
                 <img 
