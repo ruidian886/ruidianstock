@@ -41,7 +41,7 @@ import {
   Legend
 } from 'recharts';
 import BlogPage from './BlogPage';
-import principalImg from './assets/principal.jpg';
+import heroImg from './assets/hero.jpg';
 
 const StrategyCard = ({ 
   title, 
@@ -503,21 +503,9 @@ function LandingPage() {
   const [showQR, setShowQR] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  // Image is imported directly to ensure Vite bundles it correctly
-  const [profileImage, setProfileImage] = useState<string>(principalImg);
-
-  useEffect(() => {
-    // Check if the image exists, if not try fallback
-    const img = new Image();
-    img.src = principalImg;
-    img.onload = () => {
-      console.log('Successfully loaded principal image');
-    };
-    img.onerror = () => {
-      console.warn('Principal image failed to load, using placeholder');
-      setProfileImage('https://picsum.photos/seed/finance/800/1000');
-    };
-  }, []);
+  
+  // Using the imported image directly. Vite will handle the path.
+  const profileImage = heroImg;
 
   // Handle hash scroll on mount and hash change
   useEffect(() => {
@@ -701,10 +689,6 @@ function LandingPage() {
                     alt="主理人" 
                     className="w-full h-full object-cover" 
                     src={profileImage}
-                    onError={(e) => {
-                      console.error('Image failed to load:', profileImage);
-                      e.currentTarget.src = 'https://picsum.photos/seed/finance/800/1000';
-                    }}
                     referrerPolicy="no-referrer"
                   />
                 </div>
