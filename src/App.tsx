@@ -502,8 +502,9 @@ function LandingPage() {
   const [showQR, setShowQR] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  // Image is loaded from /public/principal.jpg
   const [profileImage] = useState<string | null>(() => {
-    return '/name.jpeg';
+    return '/principal.jpg';
   });
 
   // Handle hash scroll on mount and hash change
@@ -687,7 +688,7 @@ function LandingPage() {
                   <img 
                     alt="主理人" 
                     className="w-full h-full object-cover" 
-                    src={profileImage || '/name.jpeg'}
+                    src={profileImage || '/principal.jpg'}
                     referrerPolicy="no-referrer"
                   />
                 </div>
