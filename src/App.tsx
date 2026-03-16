@@ -503,15 +503,20 @@ function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   // Image is loaded from /public/principal.jpg
-  const [profileImage, setProfileImage] = useState<string>('/principal.jpg');
+  const [profileImage, setProfileImage] = useState<string>('/principal.jpg?v=' + Date.now());
 
   useEffect(() => {
     // Check if the image exists, if not try fallback
     const img = new Image();
-    img.src = '/principal.jpg';
+    const testPath = '/principal.jpg';
+    img.src = testPath;
+    img.onload = () => {
+      console.log('Successfully loaded principal.jpg');
+      setProfileImage(testPath + '?v=' + Date.now());
+    };
     img.onerror = () => {
-      console.log('principal.jpg not found, trying fallback...');
-      // If principal.jpg fails, we could try other common names if needed
+      console.warn('principal.jpg not found at ' + testPath + ', using placeholder');
+      setProfileImage('https://picsum.photos/seed/finance/800/1000');
     };
   }, []);
 
@@ -696,7 +701,11 @@ function LandingPage() {
                   <img 
                     alt="主理人" 
                     className="w-full h-full object-cover" 
-                    src={profileImage || '/principal.jpg'}
+                    src={profileImage}
+                    onError={(e) => {
+                      console.error('Image failed to load:', profileImage);
+                      e.currentTarget.src = 'https://picsum.photos/seed/finance/800/1000';
+                    }}
                     referrerPolicy="no-referrer"
                   />
                 </div>
