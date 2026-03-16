@@ -41,6 +41,7 @@ import {
   Legend
 } from 'recharts';
 import BlogPage from './BlogPage';
+import principalImg from './assets/principal.jpg';
 
 const StrategyCard = ({ 
   title, 
@@ -502,20 +503,18 @@ function LandingPage() {
   const [showQR, setShowQR] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  // Image is loaded from /public/principal.jpg
-  const [profileImage, setProfileImage] = useState<string>('/principal.jpg?v=' + Date.now());
+  // Image is imported directly to ensure Vite bundles it correctly
+  const [profileImage, setProfileImage] = useState<string>(principalImg);
 
   useEffect(() => {
     // Check if the image exists, if not try fallback
     const img = new Image();
-    const testPath = '/principal.jpg';
-    img.src = testPath;
+    img.src = principalImg;
     img.onload = () => {
-      console.log('Successfully loaded principal.jpg');
-      setProfileImage(testPath + '?v=' + Date.now());
+      console.log('Successfully loaded principal image');
     };
     img.onerror = () => {
-      console.warn('principal.jpg not found at ' + testPath + ', using placeholder');
+      console.warn('Principal image failed to load, using placeholder');
       setProfileImage('https://picsum.photos/seed/finance/800/1000');
     };
   }, []);
