@@ -677,22 +677,6 @@ function LandingPage() {
         <section className="py-24 bg-background-light dark:bg-background-dark border-y border-primary-dim/5 scroll-mt-20" id="principal-page">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                className="relative"
-              >
-                <div className="absolute -inset-4 bg-primary-dim/20 rounded-2xl blur-2xl opacity-20"></div>
-                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/5 shadow-2xl bg-primary-dim/10 flex items-center justify-center">
-                  <img 
-                    alt="主理人" 
-                    className="w-full h-full object-cover" 
-                    src={profileImage}
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-              </motion.div>
               <div className="space-y-8">
                 <div>
                   <h2 className="text-primary-dim font-bold uppercase tracking-widest text-sm mb-3">主理人页面</h2>
@@ -724,6 +708,22 @@ function LandingPage() {
                   下载专业简历 <Download className="w-4 h-4" />
                 </button>
               </div>
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
+                <div className="absolute -inset-4 bg-primary-dim/20 rounded-2xl blur-2xl opacity-20"></div>
+                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/5 shadow-2xl bg-primary-dim/10 flex items-center justify-center">
+                  <img 
+                    alt="主理人" 
+                    className="w-full h-full object-cover" 
+                    src={profileImage}
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+              </motion.div>
             </div>
           </div>
         </section>
