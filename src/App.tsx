@@ -41,7 +41,6 @@ import {
   Legend
 } from 'recharts';
 import BlogPage from './BlogPage';
-import heroImg from './assets/hero.jpg';
 
 const StrategyCard = ({ 
   title, 
@@ -504,8 +503,8 @@ function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   
-  // Using the imported image directly. Vite will handle the path.
-  const profileImage = heroImg;
+  // Using the root-relative path for the image to ensure it works correctly on Vercel.
+  const profileImage = "/hero.jpg";
 
   // Handle hash scroll on mount and hash change
   useEffect(() => {
