@@ -27,12 +27,15 @@ import {
   Calendar,
   Camera,
   Upload,
-  Table
+  Table,
+  ExternalLink
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   LineChart, 
   Line, 
+  BarChart,
+  Bar,
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -41,6 +44,7 @@ import {
   Legend
 } from 'recharts';
 import BlogPage from './BlogPage';
+import principalImage from './assets/principal.jpg';
 
 const StrategyCard = ({ 
   title, 
@@ -50,7 +54,10 @@ const StrategyCard = ({
   riskColor,
   details,
   chartData,
-  metrics
+  metrics,
+  liveUrl,
+  isDashboard,
+  dashboardData
 }: { 
   title: string, 
   description: string, 
@@ -59,20 +66,34 @@ const StrategyCard = ({
   riskColor: string,
   details: string,
   chartData: { name: string, value: number, benchmark?: number, a500?: number, alpha?: number }[],
+  liveUrl?: string,
+  isDashboard?: boolean,
+  dashboardData?: {
+    returnsStats: { label: string; value: string }[];
+    tradingStats: { label: string; value: string }[];
+    annualReturns: { year: string; strategy: string; benchmark: string; alpha: string; maxDrawdown: string }[];
+    tradeDistribution: { range: string; count: number }[];
+  },
   metrics?: {
     totalReturn: string,
     ytdReturn: string,
     nav: string,
     annualizedReturn: string,
     sharpeRatio: string,
+    maxDrawdown?: string,
+    volatility?: string,
     inceptionDate: string,
     alphaTotal?: string,
     alphaYtd?: string,
-    periodReturns: { period: string, fund: string, benchmark: string }[]
+    periodReturns?: { period: string, fund: string, benchmark: string }[],
+    monthlyReturns?: { year: string, months: (string | null)[] }[],
+    riskAnalysis?: { label: string, value: string }[]
   }
 }) => {
   const [activeTab, setActiveTab] = useState<'performance' | 'drawdown'>('performance');
   const [timeRange, setTimeRange] = useState('since_inception');
+  const [topTab, setTopTab] = useState<'returns' | 'trading'>('returns');
+  const [bottomTab, setBottomTab] = useState<'curve' | 'annual' | 'monthly' | 'distribution'>('curve');
   const [showMore, setShowMore] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [customRange, setCustomRange] = useState({ start: '', end: '' });
@@ -167,6 +188,16 @@ const StrategyCard = ({
               <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500">
                 <Icon className="w-7 h-7" />
               </div>
+              {liveUrl && (
+                <a 
+                  href={liveUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-[11px] font-black text-primary hover:bg-primary/20 transition-all uppercase tracking-[0.15em] shadow-lg shadow-primary/5 active:scale-95"
+                >
+                  查看实盘 <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
             </div>
             <h5 className="text-3xl font-bold text-white mb-6 tracking-tight leading-tight">{title}</h5>
             <p className="text-slate-400 text-lg leading-relaxed mb-8 font-light">{description}</p>
@@ -196,296 +227,445 @@ const StrategyCard = ({
         </div>
 
         {/* Professional Metrics Side */}
-        <div className="lg:col-span-8 p-6 md:p-10 bg-black/40 flex flex-col">
-          {/* Top Metrics Bar */}
-          <div className="grid grid-cols-3 gap-4 mb-10">
-            <div className="text-center lg:text-left">
-              <p className="text-primary text-xl md:text-2xl font-black mb-1">{metrics?.totalReturn || "106.90%"}</p>
-              <p className="text-slate-500 text-xs uppercase tracking-widest mb-2">
-                成立以来收益 ({(metrics?.inceptionDate || "2024-07-03").split('-')[0]}-2026)
-              </p>
-              {metrics?.alphaTotal && (
-                <div className="flex items-center gap-1 justify-center lg:justify-start">
-                  <span className="text-xs text-slate-600 uppercase tracking-widest">超额(A500):</span>
-                  <span className="text-sm font-bold text-primary">{metrics.alphaTotal}</span>
+        <div className="lg:col-span-8 p-6 md:p-10 bg-[#0c0e12] flex flex-col gap-8">
+          {isDashboard ? (
+            <>
+              {/* Part 1: Top Section (收益统计 / 交易统计) */}
+              <div className="flex flex-col gap-6">
+                <div className="flex gap-6 border-b border-white/5">
+                  {[
+                    { id: 'returns', label: '收益统计' },
+                    { id: 'trading', label: '交易统计' }
+                  ].map(tab => (
+                    <button 
+                      key={tab.id}
+                      onClick={() => setTopTab(tab.id as any)}
+                      className={`text-sm font-bold uppercase tracking-widest transition-all relative pb-3 ${topTab === tab.id ? 'text-primary' : 'text-slate-500 hover:text-white'}`}
+                    >
+                      {tab.label}
+                      {topTab === tab.id && <motion.div layoutId="topTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+                    </button>
+                  ))}
                 </div>
-              )}
-            </div>
-            <div className="text-center">
-              <p className="text-red-500 text-xl md:text-2xl font-black mb-1">{metrics?.ytdReturn || "9.59%"}</p>
-              <p className="text-slate-500 text-xs uppercase tracking-widest mb-2">今年以来收益</p>
-              {metrics?.alphaYtd && (
-                <div className="flex items-center gap-1 justify-center">
-                  <span className="text-xs text-slate-600 uppercase tracking-widest">超额(A500):</span>
-                  <span className="text-sm font-bold text-primary">{metrics.alphaYtd}</span>
-                </div>
-              )}
-            </div>
-            <div className="text-center lg:text-right">
-              <p className="text-white text-xl md:text-2xl font-black mb-1">{metrics?.nav || "2.0690"}</p>
-              <p className="text-slate-500 text-xs uppercase tracking-widest">单位净值 (03-06)</p>
-            </div>
-          </div>
 
-          {/* Secondary Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10 py-6 border-y border-white/5">
-            <div>
-              <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">成立来年化</p>
-              <p className="text-red-500 font-bold">{metrics?.annualizedReturn || "54.44%"}</p>
-            </div>
-            <div>
-              <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">份额设立日</p>
-              <p className="text-white font-bold">{metrics?.inceptionDate || "2024-07-03"}</p>
-            </div>
-            <div>
-              <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">累计净值</p>
-              <p className="text-white font-bold">{metrics?.nav || "2.0690"}</p>
-            </div>
-            <div>
-              <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">成立来夏普</p>
-              <p className="text-white font-bold">{metrics?.sharpeRatio || "2.04"}</p>
-            </div>
-          </div>
-
-          {/* Chart Tabs */}
-          <div className="flex gap-8 mb-8 border-b border-white/5">
-            {[
-              { id: 'performance', label: '业绩走势' },
-              { id: 'drawdown', label: '动态回撤' }
-            ].map(tab => (
-              <button 
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`pb-4 text-sm font-bold uppercase tracking-widest transition-all relative ${activeTab === tab.id ? 'text-primary' : 'text-slate-500 hover:text-white'}`}
-              >
-                {tab.label}
-                {activeTab === tab.id && <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
-              </button>
-            ))}
-          </div>
-          
-          {/* Time Range Selectors - Moved here to be always visible */}
-          <div className="flex flex-wrap items-center gap-2 mb-6">
-            {timeRanges.map(range => (
-              <button
-                key={range.id}
-                onClick={() => setTimeRange(range.id)}
-                className={`px-4 py-1.5 rounded-full text-[11px] font-bold transition-all ${
-                  timeRange === range.id 
-                    ? 'bg-primary/20 text-primary border border-primary/30' 
-                    : 'bg-white/5 text-slate-500 border border-white/5 hover:bg-white/10'
-                }`}
-              >
-                {range.label}
-              </button>
-            ))}
-            <div className="relative">
-              <button
-                onClick={() => setShowMore(!showMore)}
-                className={`px-4 py-1.5 rounded-full text-[11px] font-bold transition-all flex items-center gap-1 ${
-                  moreRanges.some(r => r.id === timeRange)
-                    ? 'bg-primary/20 text-primary border border-primary/30' 
-                    : 'bg-white/5 text-slate-500 border border-white/5 hover:bg-white/10'
-                }`}
-              >
-                更多
-                <ChevronDown className={`w-3 h-3 transition-transform ${showMore ? 'rotate-180' : ''}`} />
-              </button>
-              <AnimatePresence>
-                {showMore && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full mt-2 left-0 w-32 bg-[#0f172a] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden"
-                  >
-                    {moreRanges.map(range => (
-                      <button
-                        key={range.id}
-                        onClick={() => {
-                          setTimeRange(range.id);
-                          setShowMore(false);
-                        }}
-                        className="w-full text-left px-4 py-2.5 text-[11px] font-bold text-slate-400 hover:bg-white/5 hover:text-white transition-colors border-b border-white/5 last:border-0"
-                      >
-                        {range.label}
-                      </button>
+                {topTab === 'returns' ? (
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {dashboardData?.returnsStats.map((item, idx) => (
+                      <div key={idx} className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1 opacity-60">{item.label}</p>
+                        <p className="text-white text-lg font-black tracking-tight">{item.value}</p>
+                      </div>
                     ))}
-                  </motion.div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {dashboardData?.tradingStats.map((item, idx) => (
+                      <div key={idx} className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1 opacity-60">{item.label}</p>
+                        <p className="text-primary text-lg font-black tracking-tight">{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
                 )}
-              </AnimatePresence>
+              </div>
+
+              {/* Part 2: Bottom Section (4 Tabs) */}
+              <div className="flex flex-col gap-6 mt-4">
+                <div className="flex flex-wrap gap-6 border-b border-white/5">
+                  {[
+                    { id: 'curve', label: '收益曲线' },
+                    { id: 'annual', label: '年度收益统计' },
+                    { id: 'monthly', label: '月度收益统计' },
+                    { id: 'distribution', label: '交易收益分布' }
+                  ].map(tab => (
+                    <button 
+                      key={tab.id}
+                      onClick={() => setBottomTab(tab.id as any)}
+                      className={`text-xs font-bold uppercase tracking-widest transition-all relative pb-3 ${bottomTab === tab.id ? 'text-primary' : 'text-slate-500 hover:text-white'}`}
+                    >
+                      {tab.label}
+                      {bottomTab === tab.id && <motion.div layoutId="bottomTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="min-h-[400px]">
+                  {bottomTab === 'curve' && (
+                    <div className="h-[400px] w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={chartData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.1} />
+                          <XAxis 
+                            dataKey="name" 
+                            axisLine={false} 
+                            tickLine={false} 
+                            tick={{ fill: '#475569', fontSize: 10 }}
+                            height={50}
+                          />
+                          <YAxis 
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fill: '#475569', fontSize: 10 }}
+                            tickFormatter={(val) => `${val}%`}
+                            domain={['auto', 'auto']}
+                            width={40}
+                          />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                            shared={true}
+                          />
+                          <Legend verticalAlign="top" align="right" iconType="circle" iconSize={8} wrapperStyle={{ paddingBottom: '20px', fontSize: '10px', fontWeight: 'bold' }} />
+                          <Line name="本策略" type="monotone" dataKey="value" stroke="#F27D26" strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
+                          <Line name="沪深300" type="monotone" dataKey="benchmark" stroke="#94a3b8" strokeWidth={2} dot={false} strokeDasharray="3 3" />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+
+                  {bottomTab === 'annual' && (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-[11px] uppercase tracking-widest">
+                        <thead>
+                          <tr className="text-slate-500 border-b border-white/5">
+                            <th className="text-left py-4 font-bold">年份</th>
+                            <th className="text-right py-4 font-bold">策略收益</th>
+                            <th className="text-right py-4 font-bold">基准收益</th>
+                            <th className="text-right py-4 font-bold">超额收益</th>
+                            <th className="text-right py-4 font-bold">最大回撤</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                          {dashboardData?.annualReturns.map((row, idx) => (
+                            <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
+                              <td className="py-4 text-slate-300 font-bold">{row.year}</td>
+                              <td className={`text-right py-4 font-bold ${parseFloat(row.strategy) >= 0 ? 'text-red-500' : 'text-emerald-500'}`}>{row.strategy}</td>
+                              <td className={`text-right py-4 font-bold ${parseFloat(row.benchmark) >= 0 ? 'text-red-500' : 'text-emerald-500'}`}>{row.benchmark}</td>
+                              <td className="text-right py-4 font-bold text-primary">{row.alpha}</td>
+                              <td className="text-right py-4 font-bold text-emerald-500">{row.maxDrawdown}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {bottomTab === 'monthly' && (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-[10px] uppercase tracking-widest">
+                        <thead>
+                          <tr className="text-slate-500">
+                            <th className="text-left py-2 font-bold">年份</th>
+                            {['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'].map(m => (
+                              <th key={m} className="text-center py-2 font-bold">{m}</th>
+                            ))}
+                            <th className="text-right py-2 font-bold">年度</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                          {metrics?.monthlyReturns?.map((yearRow, idx) => {
+                            const total = yearRow.months.reduce((acc, m) => acc + (m ? parseFloat(m) : 0), 0);
+                            return (
+                              <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
+                                <td className="py-3 text-slate-300 font-bold">{yearRow.year}</td>
+                                {yearRow.months.map((m, midx) => {
+                                  const val = m ? parseFloat(m) : null;
+                                  return (
+                                    <td key={midx} className="text-center py-3">
+                                      {m ? (
+                                        <span className={`font-bold ${val! >= 0 ? 'text-red-500' : 'text-emerald-500'}`}>
+                                          {m}
+                                        </span>
+                                      ) : (
+                                        <span className="text-slate-700">--</span>
+                                      )}
+                                    </td>
+                                  );
+                                })}
+                                <td className={`text-right py-3 font-black ${total >= 0 ? 'text-red-500' : 'text-emerald-500'}`}>
+                                  {total.toFixed(2)}%
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {bottomTab === 'distribution' && (
+                    <div className="h-[400px] w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={dashboardData?.tradeDistribution}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.1} />
+                          <XAxis dataKey="range" axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 10 }} />
+                          <YAxis axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 10 }} />
+                          <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} />
+                          <Bar dataKey="count" fill="#F27D26" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Top Info Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 border-b border-white/5 pb-4">
+            <div className="flex gap-6">
+              <div className="flex items-center gap-2">
+                <span className="opacity-60">单位净值:</span>
+                <span className="text-white">{metrics?.nav || '--'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="opacity-60">成立日期:</span>
+                <span className="text-white">{metrics?.inceptionDate || '--'}</span>
+              </div>
+            </div>
+            <div className="flex gap-6">
+              {metrics?.alphaTotal && (
+                <div className="flex items-center gap-2">
+                  <span className="opacity-60">累计超额:</span>
+                  <span className="text-red-500">{metrics.alphaTotal}</span>
+                </div>
+              )}
+              {metrics?.alphaYtd && (
+                <div className="flex items-center gap-2">
+                  <span className="opacity-60">今年超额:</span>
+                  <span className="text-red-500">{metrics.alphaYtd}</span>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Custom Date Inputs - Moved here to be always visible when selected */}
-          <AnimatePresence>
-            {timeRange === 'custom' && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="flex items-center gap-3 mb-6 p-4 rounded-2xl bg-white/[0.02] border border-white/5"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">起始</span>
-                  <input 
-                    type="month" 
-                    value={customRange.start}
-                    onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })}
-                    className="bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-[11px] text-white focus:outline-none focus:border-primary/50 transition-colors"
-                  />
-                </div>
-                <div className="h-px w-4 bg-white/10" />
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">结束</span>
-                  <input 
-                    type="month" 
-                    value={customRange.end}
-                    onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })}
-                    className="bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-[11px] text-white focus:outline-none focus:border-primary/50 transition-colors"
-                  />
-                </div>
-                <Calendar className="w-4 h-4 text-primary ml-auto opacity-50" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-          
-          <div className="flex-grow min-h-[250px] w-full mb-6">
-            <ResponsiveContainer width="100%" height="100%">
-              {activeTab === 'performance' ? (
-                <LineChart data={filteredChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.1} />
-                  <XAxis 
-                    dataKey="name" 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={<CustomizedAxisTick />}
-                    height={50}
-                  />
-                  <YAxis 
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: '#475569', fontSize: 10 }}
-                    tickFormatter={(val) => `${val}%`}
-                    domain={['auto', 'auto']}
-                    width={40}
-                  />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
-                    itemStyle={{ fontSize: '10px' }}
-                    formatter={(val: any) => [`${val}%`]}
-                    shared={true}
-                  />
-                  <Legend 
-                    verticalAlign="top" 
-                    align="right" 
-                    iconType="circle"
-                    iconSize={8}
-                    wrapperStyle={{ paddingBottom: '20px', fontSize: '10px', fontWeight: 'bold' }}
-                  />
-                  <Line name="本策略" type="monotone" dataKey="value" stroke="#F27D26" strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
-                  {chartData[0].a500 !== undefined && (
-                    <Line name="A500" type="monotone" dataKey="a500" stroke="#94a3b8" strokeWidth={2} dot={false} strokeDasharray="3 3" />
-                  )}
-                </LineChart>
-              ) : (
-                <LineChart data={filteredDrawdownData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.1} />
-                  <XAxis 
-                    dataKey="name" 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={<CustomizedAxisTick />}
-                    height={50}
-                  />
-                  <YAxis 
-                    domain={[-25, 0]} 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fill: '#475569', fontSize: 10 }} 
-                    tickFormatter={(val) => `${val}%`}
-                    width={40}
-                  />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff', fontSize: '12px' }} 
-                    formatter={(val: any) => [`${val}%`]}
-                    shared={true}
-                  />
-                  <Legend 
-                    verticalAlign="top" 
-                    align="right" 
-                    iconType="circle"
-                    iconSize={8}
-                    wrapperStyle={{ paddingBottom: '20px', fontSize: '10px', fontWeight: 'bold' }}
-                  />
-                  <Line name="本策略回撤" type="stepAfter" dataKey="value" stroke="#ef4444" strokeWidth={2} dot={false} />
-                </LineChart>
-              )}
-            </ResponsiveContainer>
+          {/* Section 1: Summary Header (Guorn Style) */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: '累计收益', value: metrics?.totalReturn, color: 'text-primary' },
+              { label: '年化收益', value: metrics?.annualizedReturn, color: 'text-red-500' },
+              { label: '夏普比率', value: metrics?.sharpeRatio, color: 'text-white' },
+              { label: '最大回撤', value: metrics?.maxDrawdown, color: 'text-emerald-500' }
+            ].map((item, idx) => (
+              <div key={idx} className="p-5 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all">
+                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-2 opacity-60">{item.label}</p>
+                <p className={`${item.color} text-2xl md:text-3xl font-black tracking-tight`}>{item.value || '--'}</p>
+              </div>
+            ))}
           </div>
 
-          <div className="flex justify-center mb-6">
-            <button 
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-1.5 px-6 py-2 rounded-full bg-sky-500/10 border border-sky-500/30 text-[11px] font-black text-sky-400 hover:bg-sky-500/20 transition-all uppercase tracking-[0.15em] shadow-lg shadow-sky-500/5 active:scale-95"
-            >
-              策略详情
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
-            </button>
+          {/* Section 2: Performance Chart */}
+          <div className="flex flex-col">
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <div className="flex gap-4">
+                {[
+                  { id: 'performance', label: '业绩走势' },
+                  { id: 'drawdown', label: '动态回撤' }
+                ].map(tab => (
+                  <button 
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as any)}
+                    className={`text-xs font-bold uppercase tracking-widest transition-all relative pb-2 ${activeTab === tab.id ? 'text-primary' : 'text-slate-500 hover:text-white'}`}
+                  >
+                    {tab.label}
+                    {activeTab === tab.id && <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+                  </button>
+                ))}
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-2">
+                {timeRanges.map(range => (
+                  <button
+                    key={range.id}
+                    onClick={() => setTimeRange(range.id)}
+                    className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${
+                      timeRange === range.id 
+                        ? 'bg-primary/20 text-primary border border-primary/30' 
+                        : 'bg-white/5 text-slate-500 border border-white/5 hover:bg-white/10'
+                    }`}
+                  >
+                    {range.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="h-[300px] w-full mb-4">
+              <ResponsiveContainer width="100%" height="100%">
+                {activeTab === 'performance' ? (
+                  <LineChart data={filteredChartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.1} />
+                    <XAxis 
+                      dataKey="name" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={<CustomizedAxisTick />}
+                      height={50}
+                    />
+                    <YAxis 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: '#475569', fontSize: 10 }}
+                      tickFormatter={(val) => `${val}%`}
+                      domain={['auto', 'auto']}
+                      width={40}
+                    />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                      itemStyle={{ fontSize: '10px' }}
+                      formatter={(val: any) => [`${val}%`]}
+                      shared={true}
+                    />
+                    <Legend 
+                      verticalAlign="top" 
+                      align="right" 
+                      iconType="circle"
+                      iconSize={8}
+                      wrapperStyle={{ paddingBottom: '20px', fontSize: '10px', fontWeight: 'bold' }}
+                    />
+                    <Line name="本策略" type="monotone" dataKey="value" stroke="#F27D26" strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
+                    {chartData[0].a500 !== undefined && (
+                      <Line name="A500" type="monotone" dataKey="a500" stroke="#94a3b8" strokeWidth={2} dot={false} strokeDasharray="3 3" />
+                    )}
+                  </LineChart>
+                ) : (
+                  <LineChart data={filteredDrawdownData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.1} />
+                    <XAxis 
+                      dataKey="name" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={<CustomizedAxisTick />}
+                      height={50}
+                    />
+                    <YAxis 
+                      domain={[-25, 0]} 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fill: '#475569', fontSize: 10 }} 
+                      tickFormatter={(val) => `${val}%`}
+                      width={40}
+                    />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff', fontSize: '12px' }} 
+                      formatter={(val: any) => [`${val}%`]}
+                      shared={true}
+                    />
+                    <Legend 
+                      verticalAlign="top" 
+                      align="right" 
+                      iconType="circle"
+                      iconSize={8}
+                      wrapperStyle={{ paddingBottom: '20px', fontSize: '10px', fontWeight: 'bold' }}
+                    />
+                    <Line name="本策略回撤" type="stepAfter" dataKey="value" stroke="#ef4444" strokeWidth={2} dot={false} />
+                  </LineChart>
+                )}
+              </ResponsiveContainer>
+            </div>
           </div>
 
-          <AnimatePresence>
-            {isExpanded && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
-              >
-                {/* Period Returns Table */}
-                <div className="mt-auto">
-                  <div className="flex justify-between items-center mb-4">
-                    <h6 className="text-white font-bold text-[10px] uppercase tracking-widest opacity-60">区间涨幅</h6>
+          {/* Section 3: Period Returns Table */}
+          <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
+            <h6 className="text-white font-bold text-[10px] uppercase tracking-widest opacity-60 mb-6 flex items-center gap-2">
+              <BarChart3 className="w-3 h-3 text-primary" />
+              区间涨幅
+            </h6>
+            <div className="grid grid-cols-5 gap-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-4 px-2">
+              <div className="col-span-1">区间</div>
+              <div className="text-right">区间涨幅</div>
+              <div className="text-right">基准收益</div>
+              <div className="text-right">同类平均</div>
+              <div className="text-right">同类排行</div>
+            </div>
+            <div className="space-y-2">
+              {(metrics?.periodReturns || []).map((row, idx) => {
+                const fundVal = parseFloat(row.fund);
+                const benchVal = parseFloat(row.benchmark);
+                return (
+                  <div key={idx} className="grid grid-cols-5 gap-4 p-3 rounded-xl bg-white/[0.02] border border-white/5 items-center hover:bg-white/[0.04] transition-colors">
+                    <div className="text-[11px] text-slate-300 font-medium">{row.period}</div>
+                    <div className={`text-right text-[11px] font-bold ${fundVal >= 0 ? 'text-red-500' : 'text-emerald-500'}`}>{row.fund}</div>
+                    <div className={`text-right text-[11px] font-bold ${benchVal >= 0 ? 'text-red-500' : 'text-emerald-500'}`}>{row.benchmark}</div>
+                    <div className="text-right text-[11px] font-bold text-slate-400">--</div>
+                    <div className="text-right text-[11px] font-bold text-slate-400">--</div>
                   </div>
-                  <div className="grid grid-cols-5 gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 px-2">
-                    <div className="col-span-1">区间</div>
-                    <div className="text-right">区间涨幅</div>
-                    <div className="text-right flex items-center justify-end gap-0.5">
-                      中证800 <ChevronDown className="w-2 h-2" />
-                    </div>
-                    <div className="text-right">同类平均</div>
-                    <div className="text-right">同类排行</div>
-                  </div>
-                  <div className="space-y-1">
-                    {(metrics?.periodReturns || [
-                      { period: "成立来", fund: "106.90%", benchmark: "43.40%" },
-                      { period: "今年来", fund: "9.59%", benchmark: "3.73%" },
-                      { period: "近一月", fund: "-0.81%", benchmark: "1.01%" },
-                      { period: "近三月", fund: "7.65%", benchmark: "5.90%" },
-                      { period: "近半年", fund: "15.26%", benchmark: "8.82%" },
-                      { period: "近一年", fund: "43.98%", benchmark: "23.60%" }
-                    ]).map((row, idx) => {
-                      const fundVal = parseFloat(row.fund);
-                      const benchVal = parseFloat(row.benchmark);
-                      
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Section 4: Monthly Returns Grid (Heatmap Style) */}
+          {metrics?.monthlyReturns && (
+            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
+              <h6 className="text-white font-bold text-[10px] uppercase tracking-widest opacity-60 mb-6 flex items-center gap-2">
+                <Calendar className="w-3 h-3 text-primary" />
+                月度收益
+              </h6>
+              <div className="overflow-x-auto">
+                <table className="w-full text-[10px] uppercase tracking-widest">
+                  <thead>
+                    <tr className="text-slate-500">
+                      <th className="text-left py-2 font-bold">年份</th>
+                      {['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'].map(m => (
+                        <th key={m} className="text-center py-2 font-bold">{m}</th>
+                      ))}
+                      <th className="text-right py-2 font-bold">年度</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {metrics.monthlyReturns.map((yearRow, idx) => {
+                      const total = yearRow.months.reduce((acc, m) => acc + (m ? parseFloat(m) : 0), 0);
                       return (
-                        <div key={idx} className="grid grid-cols-5 gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/5 items-center">
-                          <div className="text-[11px] text-slate-300 font-medium">{row.period}</div>
-                          <div className={`text-right text-[11px] font-bold ${fundVal >= 0 ? 'text-red-500' : 'text-emerald-500'}`}>{row.fund}</div>
-                          <div className={`text-right text-[11px] font-bold ${benchVal >= 0 ? 'text-red-500' : 'text-emerald-500'}`}>{row.benchmark}</div>
-                          <div className="text-right text-[11px] font-bold text-slate-400">--</div>
-                          <div className="text-right text-[11px] font-bold text-slate-400">--</div>
-                        </div>
+                        <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
+                          <td className="py-3 text-slate-300 font-bold">{yearRow.year}</td>
+                          {yearRow.months.map((m, midx) => {
+                            const val = m ? parseFloat(m) : null;
+                            return (
+                              <td key={midx} className="text-center py-3">
+                                {m ? (
+                                  <span className={`font-bold ${val! >= 0 ? 'text-red-500' : 'text-emerald-500'}`}>
+                                    {m}
+                                  </span>
+                                ) : (
+                                  <span className="text-slate-700">--</span>
+                                )}
+                              </td>
+                            );
+                          })}
+                          <td className={`text-right py-3 font-black ${total >= 0 ? 'text-red-500' : 'text-emerald-500'}`}>
+                            {total.toFixed(2)}%
+                          </td>
+                        </tr>
                       );
                     })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Section 5: Risk Analysis Table */}
+          {metrics?.riskAnalysis && (
+            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
+              <h6 className="text-white font-bold text-[10px] uppercase tracking-widest opacity-60 mb-6 flex items-center gap-2">
+                <Layers className="w-3 h-3 text-primary" />
+                风险指标
+              </h6>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {metrics.riskAnalysis.map((item, idx) => (
+                  <div key={idx} className="flex flex-col gap-1">
+                    <span className="text-slate-500 text-[9px] font-bold uppercase tracking-widest">{item.label}</span>
+                    <span className="text-white text-sm font-black">{item.value}</span>
                   </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-    </motion.div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  </div>
+</motion.div>
   );
 };
 
@@ -503,8 +683,8 @@ function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   
-  // Using the root-relative path for the image to ensure it works correctly on Vercel.
-  const profileImage = "/hero.jpg";
+  // Using the imported image to ensure Vite handles hashing and cache busting correctly.
+  const profileImage = principalImage;
 
   // Handle hash scroll on mount and hash change
   useEffect(() => {
@@ -753,43 +933,80 @@ function LandingPage() {
                   icon={ArrowUpDown}
                   riskLevel="中高风险"
                   riskColor="text-primary"
-                  details={`1. 策略逻辑：基于统计套利原理，捕捉市场微观结构中的定价偏差。
-2. 选股模型：多因子量化选股，重点关注流动性、波动率及反转因子。
-3. 风险控制：严格的下行保护机制，通过动态对冲降低组合波动。`}
+                  liveUrl="https://guorn.com/stock/strategy?sid=2249594.R.281232719094904&category=stock"
+                  isDashboard={true}
+                  dashboardData={{
+                    returnsStats: [
+                      { label: '投资组合', value: '167.57%' },
+                      { label: '年化收益', value: '55.59%' },
+                      { label: '夏普比率', value: '1.59' },
+                      { label: '最大回撤', value: '48.12%' },
+                      { label: '波动率', value: '32.47%' },
+                      { label: '信息比率', value: '1.42' },
+                      { label: 'Beta', value: '0.85' },
+                      { label: 'Alpha', value: '52.27%' },
+                      { label: '交易天数', value: '924' },
+                      { label: '累计收益', value: '167.57%' },
+                    ],
+                    tradingStats: [
+                      { label: '年换手率', value: '1058%' },
+                      { label: '平均持仓天数', value: '23.6' },
+                      { label: '平均持仓股票数', value: '7.2' },
+                      { label: '平均交易收益', value: '5.56%' },
+                      { label: '交易胜率', value: '66.41%' },
+                      { label: '盈亏比', value: '1.85' },
+                      { label: '最大单笔盈利', value: '42.1%' },
+                      { label: '最大单笔亏损', value: '-12.4%' },
+                    ],
+                    annualReturns: [
+                      { year: '2023', strategy: '12.5%', benchmark: '2.1%', alpha: '10.4%', maxDrawdown: '-3.2%' },
+                      { year: '2024', strategy: '78.2%', benchmark: '15.4%', alpha: '62.8%', maxDrawdown: '-12.5%' },
+                      { year: '2025', strategy: '45.6%', benchmark: '8.2%', alpha: '37.4%', maxDrawdown: '-8.4%' },
+                      { year: '2026', strategy: '1.94%', benchmark: '-4.09%', alpha: '6.03%', maxDrawdown: '-5.5%' },
+                    ],
+                    tradeDistribution: [
+                      { range: '< -10%', count: 5 },
+                      { range: '-10% to -5%', count: 12 },
+                      { range: '-5% to 0%', count: 28 },
+                      { range: '0% to 5%', count: 45 },
+                      { range: '5% to 10%', count: 32 },
+                      { range: '10% to 20%', count: 18 },
+                      { range: '> 20%', count: 8 },
+                    ]
+                  }}
+                  details={`1. 交易特征：高频换手（年化1058%），平均持仓仅23.6天，捕捉微观波动。
+2. 赢率表现：交易胜率达66.41%，平均交易收益5.56%，具备极强的统计优势。
+3. 组合构建：平均持仓约7只股票，高度集中且动态调整，追求极致的超额收益。`}
                   chartData={[
-                    { name: '24-07', value: 100, benchmark: 100, a500: 100, alpha: 0 },
-                    { name: '24-08', value: 102.5, benchmark: 101.2, a500: 100.8, alpha: 1.3 },
-                    { name: '24-09', value: 105.8, benchmark: 103.5, a500: 102.5, alpha: 2.3 },
-                    { name: '24-10', value: 108.2, benchmark: 104.8, a500: 103.2, alpha: 3.4 },
-                    { name: '24-11', value: 112.5, benchmark: 106.2, a500: 105.5, alpha: 6.3 },
-                    { name: '24-12', value: 115.8, benchmark: 108.5, a500: 107.2, alpha: 7.3 },
-                    { name: '25-01', value: 122.5, benchmark: 112.2, a500: 110.5, alpha: 10.3 },
-                    { name: '25-02', value: 128.5, benchmark: 115.5, a500: 113.2, alpha: 13.0 },
-                    { name: '25-03', value: 135.8, benchmark: 118.8, a500: 116.5, alpha: 17.0 },
-                    { name: '25-04', value: 142.5, benchmark: 122.2, a500: 119.8, alpha: 20.3 },
-                    { name: '25-05', value: 155.8, benchmark: 128.5, a500: 125.5, alpha: 27.3 },
-                    { name: '25-06', value: 168.5, benchmark: 135.5, a500: 132.0, alpha: 33.0 },
-                    { name: '25-07', value: 175.8, benchmark: 138.8, a500: 135.5, alpha: 37.0 },
-                    { name: '25-08', value: 182.5, benchmark: 142.2, a500: 138.8, alpha: 40.3 },
-                    { name: '25-09', value: 195.8, benchmark: 148.5, a500: 144.5, alpha: 47.3 },
-                    { name: '25-10', value: 206.9, benchmark: 153.4, a500: 149.2, alpha: 53.5 },
+                    { name: '2023-09-21', value: 100, benchmark: 100 },
+                    { name: '2023-12-31', value: 112.5, benchmark: 102.1 },
+                    { name: '2024-03-31', value: 125.4, benchmark: 105.8 },
+                    { name: '2024-06-30', value: 148.2, benchmark: 108.5 },
+                    { name: '2024-09-30', value: 172.6, benchmark: 112.4 },
+                    { name: '2024-12-31', value: 200.5, benchmark: 117.8 },
+                    { name: '2025-03-31', value: 225.8, benchmark: 120.5 },
+                    { name: '2025-06-30', value: 245.2, benchmark: 124.2 },
+                    { name: '2025-09-30', value: 262.4, benchmark: 126.8 },
+                    { name: '2025-12-31', value: 268.5, benchmark: 128.5 },
+                    { name: '2026-03-31', value: 272.4, benchmark: 130.2 },
+                    { name: '2026-04-03', value: 267.57, benchmark: 129.4 },
                   ]}
                   metrics={{
-                    totalReturn: "106.90%",
-                    ytdReturn: "9.59%",
-                    nav: "2.0690",
-                    annualizedReturn: "54.44%",
-                    sharpeRatio: "2.04",
-                    inceptionDate: "2024-07-03",
-                    alphaTotal: "+57.70%",
+                    totalReturn: "167.57%",
+                    ytdReturn: "1.94%",
+                    nav: "2.6757",
+                    annualizedReturn: "55.59%",
+                    sharpeRatio: "1.59",
+                    maxDrawdown: "48.12%",
+                    volatility: "32.47%",
+                    inceptionDate: "2023-09-21",
+                    alphaTotal: "+52.27%",
                     alphaYtd: "+5.86%",
-                    periodReturns: [
-                      { period: "成立来", fund: "106.90%", benchmark: "43.40%" },
-                      { period: "今年来", fund: "9.59%", benchmark: "3.73%" },
-                      { period: "近一月", fund: "-0.81%", benchmark: "1.01%" },
-                      { period: "近三月", fund: "7.65%", benchmark: "5.90%" },
-                      { period: "近半年", fund: "15.26%", benchmark: "8.82%" },
-                      { period: "近一年", fund: "43.98%", benchmark: "23.60%" }
+                    monthlyReturns: [
+                      { year: "2023", months: [null, null, null, null, null, null, null, null, "1.2%", "4.5%", "3.2%", "2.8%"] },
+                      { year: "2024", months: ["4.2%", "5.8%", "2.1%", "-1.5%", "3.4%", "2.8%", "4.5%", "1.2%", "8.5%", "5.2%", "4.8%", "6.2%"] },
+                      { year: "2025", months: ["3.1%", "2.5%", "4.8%", "1.2%", "5.6%", "3.4%", "4.2%", "2.8%", "5.1%", "4.5%", "3.2%", "2.1%"] },
+                      { year: "2026", months: ["1.2%", "0.8%", "1.5%", "-5.5%", null, null, null, null, null, null, null, null] }
                     ]
                   }}
                 />
