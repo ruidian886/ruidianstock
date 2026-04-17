@@ -817,7 +817,7 @@ function LandingPage() {
                 个人投资策略展示 / 教育交流，不提供个性化建议，用户独立决策自担风险
               </div>
               <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.1] mb-6 tracking-tight">
-                锐典：<br/><span className="text-primary text-4xl md:text-5xl">个人股票投资研究室</span>
+                锐典：<br/><span className="text-primary text-4xl md:text-5xl">股票投资研究室</span>
               </h1>
               <div className="text-xl md:text-2xl text-slate-300 leading-relaxed mb-10 font-light">
                 专注于全球股票市场的数据驱动研究与策略探索
