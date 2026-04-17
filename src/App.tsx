@@ -683,7 +683,7 @@ function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   
-  // Using the imported image to ensure Vite handles hashing and cache busting correctly.
+  // Using the imported image from assets
   const profileImage = principalImage;
 
   // Handle hash scroll on mount and hash change
