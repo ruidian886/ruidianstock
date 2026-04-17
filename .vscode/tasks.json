@@ -1,0 +1,56 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start Dev Server",
+            "type": "shell",
+            "command": "npm run dev",
+            "windows": {
+                "command": "npm run dev"
+            },
+            "group": "none",
+            "presentation": {
+                "reveal": "never",
+                "panel": "new"
+            },
+            "isBackground": false,
+            "problemMatcher": {
+                "owner": "custom",
+                "pattern": {
+                    "regexp": "^.*VITE.*ready in.*$"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^.*VITE.*$",
+                    "endsPattern": "^.*ready in.*$"
+                }
+            }
+        },
+        {
+            "label": "Build Project",
+            "type": "shell",
+            "command": "npm run build",
+            "windows": {
+                "command": "npm run build"
+            },
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Preview Build",
+            "type": "shell",
+            "command": "npm run preview",
+            "windows": {
+                "command": "npm run preview"
+            },
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        }
+    ]
+}
