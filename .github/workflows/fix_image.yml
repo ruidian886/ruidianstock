@@ -6,9 +6,7 @@ on:
 jobs:
   fix_image:
     runs-on: ubuntu-22.04
-    permissions:
-      actions: write
-      contents: write
+    permissions: write-all
     steps:
       - uses: actions/checkout@v6
         with:
