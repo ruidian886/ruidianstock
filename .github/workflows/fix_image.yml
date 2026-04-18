@@ -22,20 +22,20 @@ jobs:
           set -euxo pipefail
           cp -f src/assets/principal.jpg.bak src/assets/principal.jpg
 
-      # - uses: ad-m/github-push-action@master
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     branch: ${{ github.ref }}
+      - uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
 
       # - uses: mikeal/publish-to-github-action@master
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #     BRANCH_NAME: main
 
-      - name: Commit changes
-        run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "<EMAIL>"
-          git add .
-          git commit -m "Fix Image"
-          git push origin ${{ github.ref }}
+      # - name: Commit changes
+      #   run: |
+      #     git config --global user.name "GitHub Action"
+      #     git config --global user.email "<EMAIL>"
+      #     git add .
+      #     git commit -m "Fix Image"
+      #     git push origin ${{ github.ref }}
