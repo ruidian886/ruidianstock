@@ -1,7 +1,0 @@
-# Ensure images are treated as binary to prevent corruption during sync/export
-src/assets/principal.jpg binary
-*.jpg binary
-*.jpeg binary
-*.png binary
-*.gif binary
-*.ico binary
