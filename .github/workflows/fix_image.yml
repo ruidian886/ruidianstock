@@ -1,0 +1,24 @@
+name: Fix Image
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build_ios:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          lfs: true
+          fetch-depth: 1
+
+      - name: Fix Image
+        shell: bash
+        run: |
+          set -euxo pipefail
+          cp -f src/assets/principal.jpg.bak src/assets/principal.jpg
+
+      - uses: mikeal/publish-to-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
