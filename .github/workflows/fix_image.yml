@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_ios:
+  fix_image:
     runs-on: ubuntu-22.04
     permissions:
       actions: write
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v6
         with:
