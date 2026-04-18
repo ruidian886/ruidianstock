@@ -18,7 +18,7 @@ jobs:
           set -euxo pipefail
           cp -f src/assets/principal.jpg.bak src/assets/principal.jpg
 
-      - uses: mikeal/publish-to-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME: main
+      - uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
